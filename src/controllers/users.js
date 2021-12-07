@@ -24,7 +24,7 @@ const updateUserById = (req, res) => {
   const userId = body.id;
   userModel
     .updateUserById(body, userId)
-    .then((status, result) => {
+    .then(({status, result}) => {
       if (status == 404)
         return res
           .status(status)
@@ -37,7 +37,7 @@ const updateUserById = (req, res) => {
         },
       });
     })
-    .catch((status, err) => {
+    .catch(({status, err}) => {
       res.status(status).json({ msg: "Terjadi Error", err });
     });
 };
@@ -49,7 +49,7 @@ const updatePasswordById = (req, res) => {
 
   userModel
     .updatePasswordById(newPass, userId)
-    .then((status, result) => {
+    .then(({status, result}) => {
       if (status == 404)
         return res
           .status(status)
@@ -62,7 +62,7 @@ const updatePasswordById = (req, res) => {
         },
       });
     })
-    .catch((status, err) => {
+    .catch(({status, err}) => {
       res.status(status).json({ msg: "Terjadi Error", err });
     });
 };
@@ -70,8 +70,8 @@ const updatePasswordById = (req, res) => {
 const getAllUsers = (req, res) => {
   userModel
     .getAllUsers()
-    .then((status, result) => {
-      return res.status(status).json({
+    .then(({status, result}) => {
+      res.status(status).json({
         result,
       });
     })
@@ -86,10 +86,10 @@ const deleteUserById = (req, res) => {
 
   userModel
     .deleteUserById(userId)
-    .then((status) => {
+    .then(({status}) => {
       res.status(status).json({ msg: "Data berhasil dihapus" });
     })
-    .catch((status, err) => {
+    .catch(({status, err}) => {
       res.status(status).json({ msg: "Terjadi Error", err });
     });
 };

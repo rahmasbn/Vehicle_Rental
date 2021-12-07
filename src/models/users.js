@@ -13,7 +13,7 @@ const postNewUser = (body) => {
 const updateUserById = (body, userId) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `UPDATE users SET ? WHERE id = ${userId}`;
-    db.query(sqlQuery, (err, result) => {
+    db.query(sqlQuery, body, (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.affectedRows == 0) return resolve({ status: 404, result });
       resolve({ status: 200, result });
