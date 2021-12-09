@@ -4,12 +4,12 @@ const mainRouter = express.Router();
 const userRouter = require("./users");
 const vehicleRouter = require("./vehicles");
 const transactionRouter = require("./transaction");
-const locationRouter = require("./location");
+const cityRouter = require("./cities");
 
 mainRouter.use("/users", userRouter)                // /users
 mainRouter.use("/vehicles", vehicleRouter)          // /vehicles
 mainRouter.use("/transaction", transactionRouter)   // /transaction
-mainRouter.use("/location", locationRouter)         // /location
+mainRouter.use("/cities", cityRouter)               // /cities
 
 module.exports = mainRouter;
 

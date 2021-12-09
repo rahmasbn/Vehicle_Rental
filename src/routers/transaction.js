@@ -9,7 +9,7 @@ const transactionRouter = express.Router();
 transactionRouter.post("/", transactionController.postNewTransaction);
 
 // update data
-transactionRouter.put("/", transactionController.updateTransactionById);
+transactionRouter.put("/:id", transactionController.updateTransactionById);
 
 // Transaction by vehicle type
 transactionRouter.get("/vehicleType", transactionController.getTransactionByVehicleType);
@@ -21,6 +21,6 @@ transactionRouter.get("/", transactionController.getAllTransaction);
 transactionRouter.get("/:id", transactionController.getDetailTransactionById);
 
 // delete transaction
-transactionRouter.delete("/", transactionController.deleteTransactionById);
+transactionRouter.delete("/:id", transactionController.deleteTransactionById);
 
 module.exports = transactionRouter;

@@ -3,7 +3,7 @@ const db = require("../config/db");
 const postNewUser = (body) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `INSERT INTO users SET ?`;
-    db.query(sqlQuery, body, (err, result) => {
+    db.query(sqlQuery, [body], (err, result) => {
       if (err) return reject({ status: 500, err });
       resolve({ status: 201, result });
     });
@@ -13,7 +13,7 @@ const postNewUser = (body) => {
 const updateUserById = (body, userId) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `UPDATE users SET ? WHERE id = ${userId}`;
-    db.query(sqlQuery, body, (err, result) => {
+    db.query(sqlQuery, [body], (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.affectedRows == 0) return resolve({ status: 404, result });
       resolve({ status: 200, result });
@@ -21,9 +21,9 @@ const updateUserById = (body, userId) => {
   });
 };
 
-const updatePasswordById = (newPass, userId) => {
+const updatePasswordById = (body, userId) => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = `UPDATE users SET password = "${newPass}" WHERE id = ${userId}`;
+    const sqlQuery = `UPDATE users SET password = "${body}" WHERE id = ${userId}`;
     db.query(sqlQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.affectedRows == 0) return resolve({ status: 404, result });

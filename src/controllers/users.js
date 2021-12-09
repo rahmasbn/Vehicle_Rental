@@ -1,4 +1,5 @@
 const userModel = require("../models/users");
+const responseHelper = require("../helpers/sendResponse");
 
 const postNewUser = (req, res) => {
   const { body } = req;
@@ -6,7 +7,7 @@ const postNewUser = (req, res) => {
   userModel
     .postNewUser(body)
     .then(({ status, result }) => {
-      res.status(status).json({
+      responseHelper.success(res, status, {
         msg: "Data added successfully",
         result: {
           ...body,
@@ -15,21 +16,23 @@ const postNewUser = (req, res) => {
       });
     })
     .catch((status, err) => {
-      res.status(status).json({ msg: "Terjadi Error", err });
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
 };
 
 const updateUserById = (req, res) => {
   const { body } = req;
-  const userId = body.id;
+  const { params } = req;
+  const userId = params.id;
   userModel
     .updateUserById(body, userId)
-    .then(({status, result}) => {
+    .then(({ status, result }) => {
       if (status == 404)
-        return res
-          .status(status)
-          .json({ msg: "User tidak ditemukan", result: [] });
-      res.status(status).json({
+        return responseHelper.success(res, status, {
+          msg: "User tidak ditemukan",
+          result,
+        });
+      responseHelper.success(res, status, {
         msg: "Data updated successfully",
         result: {
           ...body,
@@ -37,60 +40,60 @@ const updateUserById = (req, res) => {
         },
       });
     })
-    .catch(({status, err}) => {
-      res.status(status).json({ msg: "Terjadi Error", err });
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
 };
 
 const updatePasswordById = (req, res) => {
   const { body } = req;
-  const newPass = body.password;
-  const userId = body.id;
+  // const newPass = body.password;
+  const { params } = req;
+  const userId = params.id;
 
   userModel
-    .updatePasswordById(newPass, userId)
-    .then(({status, result}) => {
+    .updatePasswordById(body, userId)
+    .then(({ status, result }) => {
       if (status == 404)
-        return res
-          .status(status)
-          .json({ msg: "User tidak ditemukan", result: [] });
-      res.status(status).json({
+        return responseHelper.success(res, status, {
+          msg: "User tidak ditemukan",
+          result,
+        });
+      responseHelper.success(res, status, {
         msg: "Password updated successfully",
         result: {
-          newPass,
+          ...body,
           changeRows: result.changedRows,
         },
       });
     })
-    .catch(({status, err}) => {
-      res.status(status).json({ msg: "Terjadi Error", err });
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
 };
 
 const getAllUsers = (req, res) => {
   userModel
     .getAllUsers()
-    .then(({status, result}) => {
-      res.status(status).json({
-        result,
-      });
+    .then(({ status, result }) => {
+      responseHelper.success(res, status, { result });
     })
     .catch((status, err) => {
-      res.status(status).json({ msg: "Terjadi Error", err });
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
 };
 
 const deleteUserById = (req, res) => {
-  const { query } = req;
-  const userId = query.id;
+  const { params } = req;
+  const userId = params.id;
 
   userModel
     .deleteUserById(userId)
-    .then(({status}) => {
-      res.status(status).json({ msg: "Data berhasil dihapus" });
+    .then(({ status }) => {
+      responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
-    .catch(({status, err}) => {
-      res.status(status).json({ msg: "Terjadi Error", err });
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
 };
 

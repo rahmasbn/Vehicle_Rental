@@ -9,15 +9,15 @@ const userRouter = express.Router();
 userRouter.post("/", userController.postNewUser);
 
 // update user data by id
-userRouter.put("/updateUser", userController.updateUserById);
+userRouter.put("/:id", userController.updateUserById);
 
 // update user password
-userRouter.patch("/update-pass", userController.updatePasswordById);
+userRouter.patch("/:id", userController.updatePasswordById);
 
 // get All users
 userRouter.get("/", userController.getAllUsers);
 
 // delete user by id
-userRouter.delete("/", userController.deleteUserById);
+userRouter.delete("/:id", userController.deleteUserById);
 
 module.exports = userRouter;

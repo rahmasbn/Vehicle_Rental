@@ -1,148 +1,103 @@
-const mysql = require("mysql");
-const db = require("../config/db");
+const transactionModel = require("../models/transaction");
+const responseHelper = require("../helpers/sendResponse");
 
 const postNewTransaction = (req, res) => {
-  const {
-    body: {
-      user_id,
-      vehicle_id,
-      type_id,
-      location_id,
-      city_id,
-      quantity,
-      start_date,
-      return_date,
-      total_price,
-      status,
-      rating,
-    },
-  } = req;
+  const { body } = req;
 
-  const sqlQuery = `INSERT INTO transaction (user_id, vehicle_id, type_id, location_id, city_id, quantity, start_date, return_date, total_price, status, rating) 
-        VALUES (${user_id}, ${vehicle_id}, ${type_id}, ${location_id}, ${city_id}, ${quantity}, "${start_date}", "${return_date}", ${total_price}, "${status}", ${rating})`;
-
-  db.query(sqlQuery, (err, result) => {
-    if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-    return res.status(201).json({
-      msg: "Data added successfully",
-      result: {
-        user_id,
-        vehicle_id,
-        type_id,
-        location_id,
-        city_id,
-        quantity,
-        start_date,
-        return_date,
-        total_price,
-        status,
-        rating,
-        id: result.insertId,
-      },
+  transactionModel
+    .postNewTransaction(body)
+    .then(({ status, result }) => {
+      res.status(status).json({
+        msg: "Data added successfully",
+        result: {
+          ...body,
+          id: result.insertId,
+        },
+      });
+    })
+    .catch(({ status, err }) => {
+      res.status(status).json({ msg: "Terjadi Error", err });
     });
-  });
 };
 
 const updateTransactionById = (req, res) => {
-  const {
-    body: {
-      id,
-      user_id,
-      vehicle_id,
-      type_id,
-      location_id,
-      city_id,
-      quantity,
-      start_date,
-      return_date,
-      total_price,
-      status,
-      rating,
-    },
-  } = req;
+  const { body } = req;
+  const { params } = req;
+  const transactionId = params.id;
 
-  const sqlQuery = `UPDATE transaction SET user_id = ${user_id}, vehicle_id = ${vehicle_id}, type_id = ${type_id}, location_id = ${location_id}, 
-        city_id = ${city_id}, quantity = ${quantity}, start_date = "${start_date}", return_date = "${return_date}", total_price = ${total_price}, 
-        status = "${status}", rating = ${rating} WHERE id = ${id}`;
-
-  db.query(sqlQuery, (err, result) => {
-    if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-    return res.status(201).json({
-      msg: "Data updated successfully",
-      result: {
-        user_id,
-        vehicle_id,
-        type_id,
-        location_id,
-        city_id,
-        quantity,
-        start_date,
-        return_date,
-        total_price,
-        status,
-        rating,
-        id: result.insertId,
-      },
+  transactionModel
+    .updateTransactionById(body, transactionId)
+    .then(({ status, result }) => {
+      responseHelper.success(res, status, {
+        msg: "Data updated successfully",
+        result: {
+          ...body,
+          id: result.insertId,
+        },
+      });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
-  });
 };
 
 const getTransactionByVehicleType = (req, res) => {
   const { query } = req;
   const order = query.order;
+  const typeId = query.type;
 
-  const sqlQuery = `SELECT transaction.id, users.name AS "name", users.email AS "email", users.phone_number AS "phone_number",
-        users.address AS "address", vehicles.name AS "vehicle", types.name AS "type", location.name AS "location",cities.name AS "city", 
-        vehicles.price AS "price", transaction.quantity AS "qty", transaction.total_price AS "total price", transaction.start_date AS "start date", 
-        transaction.return_date AS "return date", transaction.status AS "status", transaction.rating AS "Rating" FROM transaction 
-        JOIN users ON transaction.user_id = users.id JOIN vehicles ON transaction.vehicle_id = vehicles.id JOIN types ON transaction.type_id = types.id 
-        JOIN location ON transaction.location_id = location.id JOIN cities ON transaction.city_id = cities.id WHERE transaction.type_id = ${query.type_id} 
-        ORDER BY start_date ?`;
-
-  db.query(sqlQuery, [mysql.raw(order)], (err, result) => {
-    if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-    res.status(200).json({ result });
-  });
+  transactionModel
+    .getTransactionByVehicleType(order, typeId)
+    .then(({ status, result }) => {
+      responseHelper.success(res, status, { result });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+    });
 };
 
 const getAllTransaction = (req, res) => {
-  const sqlQuery = `SELECT transaction.id, users.name AS "name", users.address AS "address", vehicles.name AS "vehicle", transaction.type_id, 
-        transaction.location_id, transaction.city_id, vehicles.price AS "price", transaction.quantity AS "qty", transaction.total_price AS "total price", 
-        transaction.start_date AS "start date", transaction.return_date AS "return date", transaction.status AS "status", transaction.rating AS "Rating" 
-        FROM transaction JOIN users ON transaction.user_id = users.id JOIN vehicles ON transaction.vehicle_id = vehicles.id`;
-  db.query(sqlQuery, (err, result) => {
-    if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-    return res.status(200).json({
-      result,
+  transactionModel
+    .getAllTransaction()
+    .then(({ status, result }) => {
+      responseHelper.success(res, status, { result });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
     });
-  });
 };
 
 const getDetailTransactionById = (req, res) => {
   const { params } = req;
-  const pathParams = params.id;
+  const transactionId = params.id;
 
-  const sqlQuery = `SELECT transaction.id, users.name AS "name", users.email AS "email", users.phone_number AS "phone_number",
-        users.address AS "address", vehicles.name AS "vehicle", types.name AS "type", location.name AS "location",cities.name AS "city", 
-        vehicles.price AS "price", transaction.quantity AS "qty", transaction.total_price AS "total price", transaction.start_date AS "start date", 
-        transaction.return_date AS "return date", transaction.status AS "status", transaction.rating AS "Rating" FROM transaction 
-        JOIN users ON transaction.user_id = users.id JOIN vehicles ON transaction.vehicle_id = vehicles.id JOIN types ON transaction.type_id = types.id 
-        JOIN location ON transaction.location_id = location.id JOIN cities ON transaction.city_id = cities.id WHERE transaction.id = ${pathParams}`;
-  db.query(sqlQuery, (err, result) => {
-    if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-    if (result.length == 0)
-      return res.status(404).json({ msg: "Transaksi tidak ditemukan", result });
-    res.status(200).json({ result });
-  });
+  transactionModel
+    .getDetailTransactionById(transactionId)
+    .then(({ status, result }) => {
+      if (status == 404)
+        return responseHelper.success(res, status, {
+          msg: "Transaksi tidak ditemukan",
+          result,
+        });
+      responseHelper.success(res, status, { result });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+    });
 };
 
 const deleteTransactionById = (req, res) => {
-  const { query } = req;
-  const sqlQuery = `DELETE FROM transaction WHERE id = ${query.id}`;
-  db.query(sqlQuery, (err) => {
-    if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-    return res.status(200).json({ msg: "Data berhasil dihapus" });
-  });
+  const { params } = req;
+  const transactionId = params.id;
+
+  transactionModel
+    .deleteTransactionById(transactionId)
+    .then(({ status }) => {
+      responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+    });
 };
 
 module.exports = {

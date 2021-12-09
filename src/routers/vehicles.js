@@ -9,7 +9,7 @@ const vehicleRouter = express.Router();
 vehicleRouter.post("/", vehicleController.postNewVehicle);
 
 // Update vehicle data by id
-vehicleRouter.put("/updateVehicle", vehicleController.updateVehicleById);
+vehicleRouter.put("/:id", vehicleController.updateVehicleById);
 
 // get vehicle by name
 vehicleRouter.get("/search", vehicleController.getVehicleByName);
@@ -17,7 +17,7 @@ vehicleRouter.get("/search", vehicleController.getVehicleByName);
 // get Vehicle by type
 vehicleRouter.get("/type", vehicleController.getVehicleByType);
 
-vehicleRouter.get("/rating", vehicleController.getVehicleByRating);
+vehicleRouter.get("/popular", vehicleController.getVehicleByRating);
 
 // All vehicles
 vehicleRouter.get("/", vehicleController.getAllVehicles);
@@ -26,7 +26,7 @@ vehicleRouter.get("/", vehicleController.getAllVehicles);
 vehicleRouter.get("/:id", vehicleController.getDetailVehicleById);
 
 // Delete vehicle by id
-vehicleRouter.delete("/", vehicleController.deleteVehicleById);
+vehicleRouter.delete("/:id", vehicleController.deleteVehicleById);
 
 // get vehicle by city
 // vehicleRouter.get("/vehicles-city", (req, res) => {
