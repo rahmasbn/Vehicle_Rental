@@ -28,17 +28,5 @@ vehicleRouter.get("/:id", vehicleController.getDetailVehicleById);
 // Delete vehicle by id
 vehicleRouter.delete("/:id", vehicleController.deleteVehicleById);
 
-// get vehicle by city
-// vehicleRouter.get("/vehicles-city", (req, res) => {
-//   const { query } = req;
-
-//   const sqlQuery = `SELECT * FROM vehicles WHERE city_id = ${query.city_id}`;
-//   // console.log(query);
-//   db.query(sqlQuery, (err, result) => {
-//     if (err) return res.status(500).json({ msg: "Terjadi Error", err });
-//     console.log(result);
-//     return res.status(200).json({ result });
-//   });
-// });
 
 module.exports = vehicleRouter;

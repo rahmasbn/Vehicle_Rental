@@ -2,12 +2,13 @@ const transactionModel = require("../models/transaction");
 const responseHelper = require("../helpers/sendResponse");
 
 const postNewTransaction = (req, res) => {
-  const { body } = req;
+  const { body, userInfo } = req;
+  console.log("[DEBUG] userInfo", userInfo);
 
   transactionModel
     .postNewTransaction(body)
     .then(({ status, result }) => {
-      res.status(status).json({
+      responseHelper.success(res, status, {
         msg: "Data added successfully",
         result: {
           ...body,
@@ -16,7 +17,7 @@ const postNewTransaction = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
-      res.status(status).json({ msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -37,7 +38,7 @@ const updateTransactionById = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -49,10 +50,10 @@ const getTransactionByVehicleType = (req, res) => {
   transactionModel
     .getTransactionByVehicleType(order, typeId)
     .then(({ status, result }) => {
-      responseHelper.success(res, status, { result });
+      responseHelper.success(res, status, result );
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -60,10 +61,10 @@ const getAllTransaction = (req, res) => {
   transactionModel
     .getAllTransaction()
     .then(({ status, result }) => {
-      responseHelper.success(res, status, { result });
+      responseHelper.success(res, status, result );
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -77,12 +78,11 @@ const getDetailTransactionById = (req, res) => {
       if (status == 404)
         return responseHelper.success(res, status, {
           msg: "Transaksi tidak ditemukan",
-          result,
         });
-      responseHelper.success(res, status, { result });
+      responseHelper.success(res, status, result );
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -96,7 +96,7 @@ const deleteTransactionById = (req, res) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 

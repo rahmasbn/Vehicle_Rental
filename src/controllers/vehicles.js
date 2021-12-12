@@ -16,7 +16,7 @@ const postNewVehicle = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -27,7 +27,7 @@ const updateVehicleById = (req, res) => {
 
   vehicleModel.updateVehicleById(body, vehicleId).then(({ status, result }) => {
     if (status == 404)
-      return responseHelper.success(res, status, { msg: "User tidak ditemukan", result });
+      return responseHelper.success(res, status, { msg: "User tidak ditemukan"});
       responseHelper.success(res, status, {
         msg: "Data updated successfully",
         result: {
@@ -36,7 +36,7 @@ const updateVehicleById = (req, res) => {
         },
       })
       .catch(({ status, err }) => {
-        responseHelper.error(res, status, { msg: "Terjadi Error", err });
+        responseHelper.error(res, status, err);
       });
   });
 };
@@ -50,10 +50,10 @@ const getVehicleByName = (req, res) => {
   vehicleModel
     .getVehicleByName(keyword, order)
     .then(({ status, result }) => {
-      responseHelper.success(res, status, {result});
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err })
+      responseHelper.error(res, status, err)
     });
 };
 
@@ -65,10 +65,10 @@ const getVehicleByType = (req, res) => {
   vehicleModel
     .getVehicleByType(typeId, order)
     .then(({ status, result }) => {
-      responseHelper.success(res, status, {result});
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -79,10 +79,10 @@ const getVehicleByRating = (req, res) => {
   vehicleModel
     .getVehicleByRating(order)
     .then(({ status, result }) => {
-      responseHelper.success(res, status, {result});
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -90,10 +90,10 @@ const getAllVehicles = (req, res) => {
   vehicleModel
     .getAllVehicles()
     .then(({ status, result }) => {
-      responseHelper.success(res, status, {result});
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -105,11 +105,11 @@ const getDetailVehicleById = (req, res) => {
     .getDetailVehicleById(vehicleId)
     .then(({ status, result }) => {
       if (status == 404)
-        return responseHelper.success(res, status, { msg: "Kendaraan tidak ditemukan", result });
-        responseHelper.success(res, status, { result });
+        return responseHelper.success(res, status, { msg: "Kendaraan tidak ditemukan" });
+        responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -123,7 +123,7 @@ const deleteVehicleById = (req, res) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 

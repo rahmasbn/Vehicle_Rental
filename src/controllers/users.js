@@ -15,8 +15,8 @@ const postNewUser = (req, res) => {
         },
       });
     })
-    .catch((status, err) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -30,7 +30,6 @@ const updateUserById = (req, res) => {
       if (status == 404)
         return responseHelper.success(res, status, {
           msg: "User tidak ditemukan",
-          result,
         });
       responseHelper.success(res, status, {
         msg: "Data updated successfully",
@@ -41,13 +40,12 @@ const updateUserById = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
 const updatePasswordById = (req, res) => {
   const { body } = req;
-  // const newPass = body.password;
   const { params } = req;
   const userId = params.id;
 
@@ -57,7 +55,6 @@ const updatePasswordById = (req, res) => {
       if (status == 404)
         return responseHelper.success(res, status, {
           msg: "User tidak ditemukan",
-          result,
         });
       responseHelper.success(res, status, {
         msg: "Password updated successfully",
@@ -68,7 +65,7 @@ const updatePasswordById = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -76,10 +73,10 @@ const getAllUsers = (req, res) => {
   userModel
     .getAllUsers()
     .then(({ status, result }) => {
-      responseHelper.success(res, status, { result });
+      responseHelper.success(res, status, result);
     })
-    .catch((status, err) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, err);
     });
 };
 
@@ -93,7 +90,7 @@ const deleteUserById = (req, res) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err );
     });
 };
 

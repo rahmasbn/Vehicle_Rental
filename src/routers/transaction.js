@@ -1,12 +1,12 @@
 const express = require("express");
 
 const transactionController = require("../controllers/transaction");
-
 const transactionRouter = express.Router();
+const authorize = require("../middlewares/authorize");
 
 // /transaction
 // new transaction
-transactionRouter.post("/", transactionController.postNewTransaction);
+transactionRouter.post("/", authorize.checkToken, transactionController.postNewTransaction);
 
 // update data
 transactionRouter.put("/:id", transactionController.updateTransactionById);
