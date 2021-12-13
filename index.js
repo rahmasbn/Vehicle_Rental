@@ -17,4 +17,6 @@ server.listen(port, () => {
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 server.use(logger);
+server.use(express.static("public"));
+
 server.use(mainRouter);

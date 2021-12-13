@@ -16,7 +16,7 @@ const postNewCity = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status,err);
     });
 };
 
@@ -27,7 +27,7 @@ const getAllCities = (req, res) => {
       responseHelper.success(res, status, { result });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, { msg: "Terjadi Error", err });
+      responseHelper.error(res, status, err);
     });
 };
 

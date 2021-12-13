@@ -34,7 +34,8 @@ const updatePasswordById = (body, userId) => {
 
 const getAllUsers = () => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = "SELECT * FROM users";
+    const sqlQuery = `SELECT u.id, u.name, u.email, u.dob, g.name AS 'gender', u.address, u.phone_number, roles.name AS 'roles'
+    FROM users u JOIN gender g ON u.gender_id = g.id JOIN roles ON u.roles_id = roles.id`;
     db.query(sqlQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
       resolve({ status: 200, result });

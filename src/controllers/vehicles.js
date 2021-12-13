@@ -3,7 +3,12 @@ const responseHelper = require("../helpers/sendResponse");
 
 const postNewVehicle = (req, res) => {
   const { body } = req;
-
+  // req.file;
+  // const image  = `${file.destination/file.filename}`;
+  // // const images = Object.assign({}, image);
+  // // console.log(images);
+  // const postWithUpload = {...body, image};
+  // console.log(postWithUpload);
   vehicleModel
     .postNewVehicle(body)
     .then(({ status, result }) => {
@@ -12,11 +17,12 @@ const postNewVehicle = (req, res) => {
         result: {
           ...body,
           id: result.insertId,
-        },
+        }, 
       });
     })
     .catch(({ status, err }) => {
       responseHelper.error(res, status, err);
+      console.log(err);
     });
 };
 
@@ -41,37 +47,6 @@ const updateVehicleById = (req, res) => {
   });
 };
 
-const getVehicleByName = (req, res) => {
-  const { query } = req;
-  const order = query.order;
-  let keyword = "";
-  if (query.name) keyword = `%${query.name}%`;
-
-  vehicleModel
-    .getVehicleByName(keyword, order)
-    .then(({ status, result }) => {
-      responseHelper.success(res, status, result);
-    })
-    .catch(({ status, err }) => {
-      responseHelper.error(res, status, err)
-    });
-};
-
-const getVehicleByType = (req, res) => {
-  const { query } = req;
-  const order = query.order;
-  const typeId = query.type_id;
-
-  vehicleModel
-    .getVehicleByType(typeId, order)
-    .then(({ status, result }) => {
-      responseHelper.success(res, status, result);
-    })
-    .catch(({ status, err }) => {
-      responseHelper.error(res, status, err);
-    });
-};
-
 const getVehicleByRating = (req, res) => {
   const { query } = req;
   const order = query.order;
@@ -86,9 +61,13 @@ const getVehicleByRating = (req, res) => {
     });
 };
 
-const getAllVehicles = (req, res) => {
+const getAllVehiclesWithOrder = (req, res) => {
+  const { query } = req;
+  const order = query.order;
+  let keyword = "";
+  if (query.name) keyword = `%${query.name}%`;
   vehicleModel
-    .getAllVehicles()
+    .getAllVehiclesWithOrder(query, keyword, order)
     .then(({ status, result }) => {
       responseHelper.success(res, status, result);
     })
@@ -130,10 +109,45 @@ const deleteVehicleById = (req, res) => {
 module.exports = {
   postNewVehicle,
   updateVehicleById,
-  getVehicleByName,
-  getVehicleByType,
+  // getVehicleByName,
+  // getVehicleByType,
   getVehicleByRating,
-  getAllVehicles,
+  getAllVehiclesWithOrder,
   getDetailVehicleById,
   deleteVehicleById,
 };
+
+
+
+
+// const getVehicleByName = (req, res) => {
+//   const { query } = req;
+//   const order = query.order;
+//   let keyword = "";
+//   if (query.name) keyword = `%${query.name}%`;
+
+//   vehicleModel
+//     .getVehicleByName(keyword, order)
+//     .then(({ status, result }) => {
+//       responseHelper.success(res, status, result);
+//     })
+//     .catch(({ status, err }) => {
+//       responseHelper.error(res, status, err)
+//     });
+// };
+
+// const getVehicleByType = (req, res) => {
+//   const { query } = req;
+//   const order = query.order;
+//   const typeId = query.type_id;
+
+//   vehicleModel
+//     .getVehicleByType(typeId, order)
+//     .then(({ status, result }) => {
+//       responseHelper.success(res, status, result);
+//     })
+//     .catch(({ status, err }) => {
+//       responseHelper.error(res, status, err);
+//     });
+// };
+

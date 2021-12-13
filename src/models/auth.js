@@ -36,25 +36,22 @@ const login = (body) => {
     const { email, password } = body;
     const sqlQuery = "SELECT * FROM users WHERE ?";
 
-    db.query(sqlQuery, [{ email }], async (err, result) => {
-
-      const plainPassword = `${password}`;
-      const hashedPassword = result[0].password;
-      const checkPassword = await bcrypt.compare(
-        plainPassword.toString(),
-        hashedPassword.toString()
-      );
+    db.query(sqlQuery, [{email}], async (err, result) => {
 
       if (err) return reject({ status: 500, err });
       // untuk cek apakah emailnya ada di db
       if (result.length == 0)
         reject({ status: 401, err: "Invalid Email/Password" });
 
+        const plainPassword = `${password}`;
+        const hashedPassword = result[0].password;
+        const checkPassword = await bcrypt.compare( plainPassword, hashedPassword );
       // untuk cek apakah password yang diinput sama dgn di db
       if (checkPassword) {
         const payload = {
           id: result[0].id,
           name: result[0].name,
+          roles: result[0].roles_id
         };
         const jwtOptions = {
           expiresIn: "10m",
