@@ -10,10 +10,11 @@ This is a REST API of vehicle rental.
 - DELETE
 
 ### TOOLS
-- Express.js
+- Express js
 - MySQL
 - ESLint
 - Morgan
 - JWT
 - Path
 - Multer
+- CORS

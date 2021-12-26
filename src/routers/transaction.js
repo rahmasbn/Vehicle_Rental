@@ -9,18 +9,18 @@ const authorize = require("../middlewares/authorize");
 transactionRouter.post("/", authorize.checkToken, transactionController.postNewTransaction);
 
 // update data
-transactionRouter.put("/:id", transactionController.updateTransactionById);
+transactionRouter.patch("/:id", authorize.checkToken, transactionController.updateTransactionById);
 
 // Transaction by vehicle type
-transactionRouter.get("/vehicleType", transactionController.getTransactionByVehicleType);
+transactionRouter.get("/vehicleType", authorize.checkToken, transactionController.getTransactionByVehicleType);
 
 // All transaction
-transactionRouter.get("/", transactionController.getAllTransaction);
+transactionRouter.get("/", authorize.checkToken, transactionController.getAllTransaction);
 
 // Detail transaction
-transactionRouter.get("/:id", transactionController.getDetailTransactionById);
+transactionRouter.get("/:id", authorize.checkToken, transactionController.getDetailTransactionById);
 
 // delete transaction
-transactionRouter.delete("/:id", transactionController.deleteTransactionById);
+transactionRouter.delete("/:id", authorize.checkToken, transactionController.deleteTransactionById);
 
 module.exports = transactionRouter;

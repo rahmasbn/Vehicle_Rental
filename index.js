@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
+
 const mainRouter = require("./src/routers/main");
 
 
@@ -14,6 +16,19 @@ server.listen(port, () => {
   console.log(`Server sudah berjalan di port ${port}`);
 });
 
+const corsOption = {
+  origin: "*",
+};
+server.use(cors(corsOption));
+server.options("/*", (req, res) => {
+  const corsHeader = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "x-access-token",
+  };
+  res.set(corsHeader);
+  res.status(204);
+})
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 server.use(logger);

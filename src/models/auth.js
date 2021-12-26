@@ -16,7 +16,7 @@ const register = (body) => {
         .then((hashedPassword) => {
           const newBody = {
             ...body,
-            roles_id : 3,
+            roles_id: 3,
             password: hashedPassword,
           };
           db.query(sqlQuery, [newBody], (err, result) => {
@@ -36,33 +36,42 @@ const login = (body) => {
     const { email, password } = body;
     const sqlQuery = "SELECT * FROM users WHERE ?";
 
-    db.query(sqlQuery, [{email}], async (err, result) => {
-
+    db.query(sqlQuery, [{ email }], async (err, result) => {
       if (err) return reject({ status: 500, err });
       // untuk cek apakah emailnya ada di db
       if (result.length == 0)
-        reject({ status: 401, err: "Invalid Email/Password" });
+        return reject({ status: 401, err: "Invalid Email/Password" });
 
-        const plainPassword = `${password}`;
+      try {
         const hashedPassword = result[0].password;
-        const checkPassword = await bcrypt.compare( plainPassword, hashedPassword );
-      // untuk cek apakah password yang diinput sama dgn di db
-      if (checkPassword) {
-        const payload = {
-          id: result[0].id,
-          name: result[0].name,
-          roles: result[0].roles_id
-        };
-        const jwtOptions = {
-          expiresIn: "10m",
-          issuer: process.env.ISSUER,
-        };
-        jwt.sign(payload, process.env.SECRET_KEY, jwtOptions, (err, token) => {
-          if (err) return reject({ status: 500, err });
-          resolve({ status: 200, result: { token } });
-        });
-      } else {
-      reject({ status: 401, err: "Invalid Email/Password" });
+        const checkPassword = await bcrypt.compare(password, hashedPassword);
+        // console.log(checkPassword);
+
+        // untuk cek apakah password yang diinput sama dgn di db
+        if (checkPassword) {
+          const payload = {
+            id: result[0].id,
+            name: result[0].name,
+            roles: result[0].roles_id,
+          };
+          const jwtOptions = {
+            expiresIn: "30m",
+            issuer: process.env.ISSUER,
+          };
+          jwt.sign(
+            payload,
+            process.env.SECRET_KEY,
+            jwtOptions,
+            (err, token) => {
+              if (err) return reject({ status: 500, err });
+              resolve({ status: 200, result: { token } });
+            }
+          );
+        } else {
+          reject({ status: 401, err: "Invalid Email/Password" });
+        }
+      } catch (err) {
+        reject({ status: 500, err });
       }
     });
   });

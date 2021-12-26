@@ -3,7 +3,7 @@ const responseHelper = require("../helpers/sendResponse");
 const register = (req, res, next) => {
   // Validasi body
   const { body } = req;
-  const registerBody = [ "name", "email", "password", "dob", "gender_id", "address", "phone_number"];
+  const registerBody = [ "name", "email", "password"];
   const bodyProperty = Object.keys(body);
   const isBodyValid =
     registerBody.filter((property) => !bodyProperty.includes(property))

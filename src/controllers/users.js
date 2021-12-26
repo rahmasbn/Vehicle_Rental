@@ -20,22 +20,27 @@ const postNewUser = (req, res) => {
     });
 };
 
-const updateUserById = (req, res) => {
+const updateProfile = (req, res) => {
   const { body } = req;
-  const { params } = req;
-  const userId = params.id;
+  const { id } = req.userInfo;
+  let data;
+
+  if (req.file) {
+    data = {
+      ...body,
+      image: req.file.path,
+    };
+  } else {
+    data = { ...body };
+  }
+
   userModel
-    .updateUserById(body, userId)
-    .then(({ status, result }) => {
-      if (status == 404)
-        return responseHelper.success(res, status, {
-          msg: "User tidak ditemukan",
-        });
+    .updateProfile(data, id)
+    .then(({ status }) => {
       responseHelper.success(res, status, {
         msg: "Data updated successfully",
         result: {
-          ...body,
-          id: result.insertId,
+          ...data,
         },
       });
     })
@@ -44,24 +49,15 @@ const updateUserById = (req, res) => {
     });
 };
 
-const updatePasswordById = (req, res) => {
+const updatePassword = (req, res) => {
   const { body } = req;
-  const { params } = req;
-  const userId = params.id;
+  const { id } = req.userInfo;
 
   userModel
-    .updatePasswordById(body, userId)
-    .then(({ status, result }) => {
-      if (status == 404)
-        return responseHelper.success(res, status, {
-          msg: "User tidak ditemukan",
-        });
+    .updatePassword(body, id)
+    .then(({ status }) => {
       responseHelper.success(res, status, {
         msg: "Password updated successfully",
-        result: {
-          ...body,
-          changeRows: result.changedRows,
-        },
       });
     })
     .catch(({ status, err }) => {
@@ -80,6 +76,18 @@ const getAllUsers = (req, res) => {
     });
 };
 
+const getUserData = (req, res) => {
+  const { id } = req.userInfo;
+  userModel
+    .getUserData(id)
+    .then(({ status, result }) => {
+      responseHelper.success(res, status, result);
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, err);
+    });
+};
+
 const deleteUserById = (req, res) => {
   const { params } = req;
   const userId = params.id;
@@ -90,14 +98,15 @@ const deleteUserById = (req, res) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
     .catch(({ status, err }) => {
-      responseHelper.error(res, status, err );
+      responseHelper.error(res, status, err);
     });
 };
 
 module.exports = {
   postNewUser,
-  updateUserById,
-  updatePasswordById,
+  updateProfile,
+  updatePassword,
   getAllUsers,
+  getUserData,
   deleteUserById,
 };

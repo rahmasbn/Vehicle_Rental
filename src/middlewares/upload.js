@@ -25,15 +25,15 @@ const uploads = multer({
             return cb(new Error("Only .png, .jpg and .jpeg format allowed!"))
         }
     },
-    limits: { fileSize: 2097152 }     //2Mb
+    limits: { fileSize: 2 * 1024 * 1024 }     //2Mb
 }).single("image");
 
 const multerHandler = (req, res, next) => {
     uploads(req, res, (err) => {
         if(err && err.code === "LIMIT_FILE_SIZE") {
-           return res.status(500).json({msg: "File size melebihi limit"});
+           return res.status(400).json({msg: "File size exceeds the limit"});
         } else if (err) {
-            return res.status(500).json({msg: "Only .png, .jpg and .jpeg format allowed!"});
+            return res.status(400).json({msg: "Only .png, .jpg and .jpeg format allowed!"});
         }
         next();
     });

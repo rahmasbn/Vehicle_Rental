@@ -7,10 +7,10 @@ const authorize = require("../middlewares/authorize")
 
 // /vehicles
 // Post new vehicle
-vehicleRouter.post("/", upload, vehicleController.postNewVehicle);
+vehicleRouter.post("/", authorize.checkToken, authorize.authorizeOwner, upload, vehicleController.postNewVehicle);
 
 // Update vehicle data by id
-vehicleRouter.put("/:id", authorize.authorizeAdminAndOwner, vehicleController.updateVehicleById);
+vehicleRouter.patch("/:id", authorize.checkToken, authorize.authorizeOwner, upload, vehicleController.updateVehicleById);
 
 vehicleRouter.get("/popular", vehicleController.getVehicleByRating);
 
@@ -21,7 +21,7 @@ vehicleRouter.get("/", vehicleController.getAllVehiclesWithOrder);
 vehicleRouter.get("/:id", vehicleController.getDetailVehicleById);
 
 // Delete vehicle by id
-vehicleRouter.delete("/:id", authorize.authorizeAdminAndOwner, vehicleController.deleteVehicleById);
+vehicleRouter.delete("/:id", authorize.checkToken ,authorize.authorizeOwner, vehicleController.deleteVehicleById);
 
 
 module.exports = vehicleRouter;

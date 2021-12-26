@@ -3,21 +3,20 @@ const responseHelper = require("../helpers/sendResponse");
 
 const postNewVehicle = (req, res) => {
   const { body } = req;
-  // req.file;
-  // const image  = `${file.destination/file.filename}`;
-  // // const images = Object.assign({}, image);
-  // // console.log(images);
-  // const postWithUpload = {...body, image};
-  // console.log(postWithUpload);
+  const newBody = {
+    ...body,
+    image: req.file.path,
+  };
+
   vehicleModel
-    .postNewVehicle(body)
+    .postNewVehicle(newBody)
     .then(({ status, result }) => {
       responseHelper.success(res, status, {
         msg: "Data added successfully",
         result: {
-          ...body,
+          ...newBody,
           id: result.insertId,
-        }, 
+        },
       });
     })
     .catch(({ status, err }) => {
@@ -30,21 +29,35 @@ const updateVehicleById = (req, res) => {
   const { body } = req;
   const { params } = req;
   const vehicleId = params.id;
+  let newBody;
 
-  vehicleModel.updateVehicleById(body, vehicleId).then(({ status, result }) => {
-    if (status == 404)
-      return responseHelper.success(res, status, { msg: "User tidak ditemukan"});
+  if (req.file) {
+    newBody = {
+      ...body,
+      image: req.file.path,
+    };
+  } else {
+    newBody = { ...body };
+  }
+
+  vehicleModel
+    .updateVehicleById(newBody, vehicleId)
+    .then(({ status }) => {
+      if (status == 404)
+        return responseHelper.success(res, status, {
+          msg: "Id vehicle tidak ditemukan",
+        });
       responseHelper.success(res, status, {
-        msg: "Data updated successfully",
+        msg: "Data added successfully",
         result: {
-          ...body,
-          id: result.insertId,
+          ...newBody,
         },
-      })
-      .catch(({ status, err }) => {
-        responseHelper.error(res, status, err);
       });
-  });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, err);
+      console.log(err);
+    });
 };
 
 const getVehicleByRating = (req, res) => {
@@ -84,8 +97,10 @@ const getDetailVehicleById = (req, res) => {
     .getDetailVehicleById(vehicleId)
     .then(({ status, result }) => {
       if (status == 404)
-        return responseHelper.success(res, status, { msg: "Kendaraan tidak ditemukan" });
-        responseHelper.success(res, status, result);
+        return responseHelper.success(res, status, {
+          msg: "Kendaraan tidak ditemukan",
+        });
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
       responseHelper.error(res, status, err);
@@ -109,45 +124,8 @@ const deleteVehicleById = (req, res) => {
 module.exports = {
   postNewVehicle,
   updateVehicleById,
-  // getVehicleByName,
-  // getVehicleByType,
   getVehicleByRating,
   getAllVehiclesWithOrder,
   getDetailVehicleById,
   deleteVehicleById,
 };
-
-
-
-
-// const getVehicleByName = (req, res) => {
-//   const { query } = req;
-//   const order = query.order;
-//   let keyword = "";
-//   if (query.name) keyword = `%${query.name}%`;
-
-//   vehicleModel
-//     .getVehicleByName(keyword, order)
-//     .then(({ status, result }) => {
-//       responseHelper.success(res, status, result);
-//     })
-//     .catch(({ status, err }) => {
-//       responseHelper.error(res, status, err)
-//     });
-// };
-
-// const getVehicleByType = (req, res) => {
-//   const { query } = req;
-//   const order = query.order;
-//   const typeId = query.type_id;
-
-//   vehicleModel
-//     .getVehicleByType(typeId, order)
-//     .then(({ status, result }) => {
-//       responseHelper.success(res, status, result);
-//     })
-//     .catch(({ status, err }) => {
-//       responseHelper.error(res, status, err);
-//     });
-// };
-

@@ -4,21 +4,25 @@ const userController = require("../controllers/users");
 
 const userRouter = express.Router();
 const authorize = require("../middlewares/authorize");
+const upload = require("../middlewares/upload");
 
 // /classes
 // post new users
-userRouter.post("/", authorize.authorizeAdminAndOwner, userController.postNewUser);
+userRouter.post("/", authorize.checkToken, authorize.authorizeAdmin, userController.postNewUser);
 
-// update user data by id
-userRouter.put("/:id", authorize.authorizeAdminAndOwner, userController.updateUserById);
+// edit profile
+userRouter.patch("/profile", authorize.checkToken, upload, userController.updateProfile);
 
 // update user password
-userRouter.patch("/:id", authorize.authorizeAdminAndOwner, userController.updatePasswordById);
+userRouter.patch("/edit-password", authorize.checkToken, userController.updatePassword);
 
 // get All users
-userRouter.get("/", authorize.authorizeAdminAndOwner, userController.getAllUsers);
+userRouter.get("/", authorize.checkToken, authorize.authorizeAdmin, userController.getAllUsers);
+
+// get User by token
+userRouter.get("/profile", authorize.checkToken, userController.getUserData);
 
 // delete user by id
-userRouter.delete("/:id", authorize.authorizeAdminAndOwner, userController.deleteUserById);
+userRouter.delete("/:id", authorize.checkToken, authorize.authorizeAdmin, userController.deleteUserById);
 
 module.exports = userRouter;

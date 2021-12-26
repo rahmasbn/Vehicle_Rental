@@ -11,7 +11,5 @@ authRouter.post("/login", validate.login, authController.login);
 // register
 authRouter.post("/register", validate.register, authController.register);
 
-// logout
-// authRouter.delete("/logout");
 
 module.exports = authRouter;

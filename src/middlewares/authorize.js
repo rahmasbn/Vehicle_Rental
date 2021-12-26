@@ -1,46 +1,38 @@
 const jwt = require("jsonwebtoken");
 
+
 const checkToken = (req, res, next) => {
   const token = req.header("x-access-token");
 
   const jwtOptions = { issuer: process.env.ISSUER };
   jwt.verify(token, process.env.SECRET_KEY, jwtOptions, (err, payload) => {
-    if (err) return res.status(403).json({ err });
-    const { id, name, roles_id } = payload;
-    req.userInfo = { id, name, roles_id };
+    if (err)
+      return res.status(403).json({ msg: "You need to login to perform this action." });
+    const { id, name, roles } = payload;
+    req.userInfo = { id, name, roles };
     next();
   });
 };
 
-const authorizeAdminAndOwner = (req, res, next) => {
-  const token = req.header("x-access-token");
-
-  const jwtOptions = { issuer: process.env.ISSUER };
-  jwt.verify(token, process.env.SECRET_KEY, jwtOptions, (err, payload) => {
-    if (err)
-      return res.status(403).json({ msg: "Silahkan login terlebih dahulu" });
-    const { roles } = payload;
-    if (roles == 1 || roles == 2) {
-      req.payload = payload;
+const authorizeOwner = (req, res, next) => {
+    const { roles } = req.userInfo;
+    if (roles == 2) {
       return next();
     }
-    res.status(403).json({ err: "Login kembali sebagai admin" });
-  });
-};
+    res.status(403).json({ err: "You need to login as Owner to perform this action." });
+  };
 
-const authorizeAllUser = (req, res, next) => {
-  const token = req.header("x-access-token");
+const authorizeAdmin = (req, res, next) => {
+    const { roles } = req.userInfo;
+    if (roles == 1) {
+      return next();
+    }
+    res.status(403).json({ err: "You need to login as Admin to perform this action." });
+  };
 
-  const jwtOptions = { issuer: process.env.ISSUER };
-  jwt.verify(token, process.env.SECRET_KEY, jwtOptions, (err) => {
-    if (err)
-      return res.status(403).json({ msg: "Silahkan login terlebih dahulu" });
-    next();
-  });
-};
 
 module.exports = {
   checkToken,
-  authorizeAdminAndOwner,
-  authorizeAllUser,
+  authorizeOwner,
+  authorizeAdmin,
 };

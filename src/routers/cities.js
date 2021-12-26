@@ -5,7 +5,7 @@ const cityRouter = express.Router();
 const authorize = require("../middlewares/authorize");
 
 // cities
-cityRouter.post("/", authorize.authorizeAdminAndOwner, cityController.postNewCity);
+cityRouter.post("/", authorize.authorizeOwner, cityController.postNewCity);
 
 cityRouter.get("/", cityController.getAllCities);
 
