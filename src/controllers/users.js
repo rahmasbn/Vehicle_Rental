@@ -28,7 +28,7 @@ const updateProfile = (req, res) => {
   if (req.file) {
     data = {
       ...body,
-      image: req.file.path,
+      image: req.file.filename,
     };
   } else {
     data = { ...body };
@@ -58,9 +58,13 @@ const updatePassword = (req, res) => {
     .then(({ status }) => {
       responseHelper.success(res, status, {
         msg: "Password updated successfully",
+        id,
       });
     })
     .catch(({ status, err }) => {
+      if (status == 401)
+        return responseHelper.error(res, status, "Current Password is invalid",
+        );
       responseHelper.error(res, status, err);
     });
 };
@@ -78,6 +82,7 @@ const getAllUsers = (req, res) => {
 
 const getUserData = (req, res) => {
   const { id } = req.userInfo;
+  console.log(id);
   userModel
     .getUserData(id)
     .then(({ status, result }) => {
@@ -87,6 +92,24 @@ const getUserData = (req, res) => {
       responseHelper.error(res, status, err);
     });
 };
+
+// const getUserById = (req, res) => {
+//   const { params } = req;
+//   const userId = params.id;
+
+//   userModel
+//     .getUserById(userId)
+//     .then(({ status, result }) => {
+//       if (status == 404)
+//         return responseHelper.success(res, status, {
+//           msg: "Id user tidak ditemukan",
+//         });
+//       responseHelper.success(res, status, result);
+//     })
+//     .catch(({ status, err }) => {
+//       responseHelper.error(res, status, err);
+//     });
+// };
 
 const deleteUserById = (req, res) => {
   const { params } = req;
@@ -108,5 +131,6 @@ module.exports = {
   updatePassword,
   getAllUsers,
   getUserData,
+  // getUserById,
   deleteUserById,
 };

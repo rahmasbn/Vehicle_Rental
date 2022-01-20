@@ -2,10 +2,18 @@ const vehicleModel = require("../models/vehicles");
 const responseHelper = require("../helpers/sendResponse");
 
 const postNewVehicle = (req, res) => {
-  const { body } = req;
+  const { body, files } = req;
+  const imgVehicle = files;
+  let images=[];
+
+  for(let i = 0; i < imgVehicle.length; i++) {
+    images += imgVehicle[i].filename + ","
+  }
+  console.log(images);
+
   const newBody = {
     ...body,
-    image: req.file.path,
+    images
   };
 
   vehicleModel
@@ -26,18 +34,23 @@ const postNewVehicle = (req, res) => {
 };
 
 const updateVehicleById = (req, res) => {
-  const { body } = req;
-  const { params } = req;
+  const { body, params, files } = req;
   const vehicleId = params.id;
+  // let imgVehicle = [];
+  // let images = [];
+  // for(let i = 0; i < imgVehicle.length; i++) {
+  //   images += imgVehicle[i].filename + ","
+  // }
   let newBody;
 
-  if (req.file) {
+  if (files) {
     newBody = {
       ...body,
-      image: req.file.path,
+      id: vehicleId,
+      images: files.filename
     };
   } else {
-    newBody = { ...body };
+    newBody = { ...body, id: vehicleId, };
   }
 
   vehicleModel
@@ -55,8 +68,8 @@ const updateVehicleById = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
+      console.log(err)
       responseHelper.error(res, status, err);
-      console.log(err);
     });
 };
 
@@ -65,7 +78,7 @@ const getVehicleByRating = (req, res) => {
   const order = query.order;
 
   vehicleModel
-    .getVehicleByRating(order)
+    .getVehicleByRating(order, query)
     .then(({ status, result }) => {
       responseHelper.success(res, status, result);
     })

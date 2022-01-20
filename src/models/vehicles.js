@@ -23,16 +23,61 @@ const updateVehicleById = (newBody, vehicleId) => {
   });
 };
 
-const getVehicleByRating = (order) => {
+const getVehicleByRating = (order, query) => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = `SELECT v.id AS "id", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", 
+    let sqlQuery = `SELECT v.id AS "id", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", v.image,
     AVG(t.rating) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
-    JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating ?`;
+    JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating desc`;
 
-    db.query(sqlQuery, [mysql.raw(order)], (err, result) => {
+    let prepStatement = [];
+    let data = '';
+    
+    // if (order){
+    //   sqlQuery += ` ?`;
+    //   prepStatement.push(mysql.raw(order));
+    //   data += `?order=${order}`
+    // }
+
+    // prepStatement.push([mysql.raw(order)]);
+
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
+    db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
-      resolve({ status: 200, result });
+
+      // Paginasi
+      let page = parseInt(query.page);
+      let limit = parseInt(query.limit);
+      // let offset = '';
+      const count = result[0].count;
+      
+      // if (!query.page && !query.limit) {
+      //   page = 1; limit = 4; offset = 0;
+      //   sqlQuery += " LIMIT ? OFFSET ?";
+      //   prepStatement.push(limit, offset);
+      // } else
+      if(query.page && query.limit) {
+        sqlQuery += " LIMIT ? OFFSET ?";
+        const offset = (page - 1) * limit;
+        prepStatement.push(limit, offset);
+        data += `?page=${page + 1}&limit=${limit}`;
+      }
+      const meta = {
+        count,
+        next: page == Math.ceil(count / limit) ? null : `/vehicles/popular`+data,
+        prev: page == 1 ? null : `/vehicles/popular`+data,
+      };
+      db.query(sqlQuery, prepStatement, (err, result) => {
+        if (err) return reject({ status: 500, err });
+        resolve({ status: 200, result: { meta, data: result } });
+      });
     });
+    
+
+
+    // db.query(sqlQuery, , (err, result) => {
+    //   if (err) return reject({ status: 500, err });
+    //   resolve({ status: 200, result });
+    // });
   });
 };
 
@@ -40,9 +85,9 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
   return new Promise((resolve, reject) => {
 
     let sqlQuery = `SELECT v.id, v.name AS "vehicle", types.name AS "type", c.name AS "city", v.capacity, v.stock, 
-    v.price FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
+    v.price, v.image FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
     const prepStatement = [];
-    let statement = '';
+    let data = '';
 
     // Filter berdasrkan tipe kendaraan
     let types = "";
@@ -50,11 +95,11 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     if (query.type && query.type.toLowerCase() == "motorbike") types = "motorbike";
     if (query.type && query.type.toLowerCase() == "bike") types = "bike";
     
-    if (types) {
-      sqlQuery += ` WHERE types.name = ?`;
-      prepStatement.push(types);
-      statement += `&type=${types}`;
-    }
+    // if (types) {
+    //   // sqlQuery += ` WHERE types.name = ?`;
+    //   prepStatement.push(types);
+    //   data += `&type=${types}`;
+    // }
 
     // Filter berdasrkan kota/lokasi
     let cities = "";
@@ -66,17 +111,32 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     if (query.city && query.city.toLowerCase() == "bogor") cities = "bogor";
     if (query.city && query.city.toLowerCase() == "medan") cities = "medan";
     
-    if (cities) {
+    // if (cities) {
+    //   // sqlQuery += ` WHERE c.name = ?`;
+    //   prepStatement.push(cities);
+    //   data += `&city=${cities}`;
+    // }
+
+    if (types && cities) {
+      sqlQuery += ` WHERE types.name = ? AND c.name = ?`;
+      prepStatement.push(types, cities);
+      data += `&type=${types}&city=${cities}`;
+    } else if (types) {
+      sqlQuery += ` WHERE types.name = ?`;
+      prepStatement.push(types);
+      data += `&type=${types}`;
+    } else if (cities) {
       sqlQuery += ` WHERE c.name = ?`;
       prepStatement.push(cities);
-      statement += `&city=${cities}`;
+      data += `&city=${cities}`;
     }
+
 
     // Search by name
     if (keyword) {
       sqlQuery += ` AND v.name LIKE ?`;
       prepStatement.push(keyword);
-      statement += `&name=${query.name}`;
+      data += `&name=${query.name}`;
     }
     
     let orderBy = "";
@@ -87,7 +147,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     if (order && orderBy ){
       sqlQuery += ` ORDER BY ? ?`;
       prepStatement.push(mysql.raw(orderBy), mysql.raw(order));
-      statement += `&sort=${query.sort}&order=${order}`
+      data += `&sort=${query.sort}&order=${order}`
     }
     const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
     db.query(countQuery, (err, result) => {
@@ -100,7 +160,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       const count = result[0].count;
       
       if (!query.page && !query.limit) {
-        page = 1; limit = 3; offset = 0;
+        page = 1; limit = 1000; offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
         prepStatement.push(limit, offset);
       } else {
@@ -110,8 +170,8 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       }
       const meta = {
         count,
-        next: page == Math.ceil(count / limit) ? null : `/vehicles?page=${page + 1}&limit=${limit}`+statement,
-        prev: page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}`+statement,
+        next: page == Math.ceil(count / limit) ? null : `/vehicles?page=${page + 1}&limit=${limit}`+data,
+        prev: page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}`+data,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
         if (err) return reject({ status: 500, err });
@@ -123,10 +183,10 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
 const getDetailVehicleById = (vehicleId) => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.price 
-    FROM vehicles v JOIN types ON vehicles.type_id = types.id JOIN cities c ON vehicles.city_id = cities.id 
-    WHERE v.id = ${vehicleId}`;
-    db.query(sqlQuery, (err, result) => {
+    const sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.price, v.image 
+    FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id 
+    WHERE v.id = ?`;
+    db.query(sqlQuery, vehicleId, (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.length == 0) return resolve({ status: 404, result });
       resolve({ status: 200, result });

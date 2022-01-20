@@ -26,10 +26,25 @@ const uploads = multer({
         }
     },
     limits: { fileSize: 2 * 1024 * 1024 }     //2Mb
-}).single("image");
+});
+
+const single = uploads.single("image");
+const multiple = uploads.array("imgVehicle", 3);
+
 
 const multerHandler = (req, res, next) => {
-    uploads(req, res, (err) => {
+    single(req, res, (err) => {
+        if(err && err.code === "LIMIT_FILE_SIZE") {
+           return res.status(400).json({msg: "File size exceeds the limit"});
+        } else if (err) {
+            return res.status(400).json({msg: "Only .png, .jpg and .jpeg format allowed!"});
+        }
+        next();
+    });
+};
+
+const multiUpload = (req, res, next) => {
+    multiple(req, res, (err) => {
         if(err && err.code === "LIMIT_FILE_SIZE") {
            return res.status(400).json({msg: "File size exceeds the limit"});
         } else if (err) {
@@ -40,5 +55,5 @@ const multerHandler = (req, res, next) => {
 };
 
 
-module.exports = multerHandler;
+module.exports = { multerHandler, multiUpload };
 // module.exports = uploads;

@@ -2,10 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 
-const register = (body) => {
+const register = (body, email) => {
   return new Promise((resolve, reject) => {
-    const registerEmail = `SELECT email FROM users WHERE email = "${body.email}"`;
-    db.query(registerEmail, (err, result) => {
+    const registerEmail = `SELECT email FROM users WHERE email = ?`;
+    db.query(registerEmail, [email], (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.length >= 1)
         return reject({ status: 400, err: "Duplicated Email" });
@@ -64,7 +64,12 @@ const login = (body) => {
             jwtOptions,
             (err, token) => {
               if (err) return reject({ status: 500, err });
-              resolve({ status: 200, result: { token } });
+              const data = {
+                token,
+                image: result[0].image,
+                roles: payload.roles,
+              };
+              resolve({ status: 200, result: data });
             }
           );
         } else {

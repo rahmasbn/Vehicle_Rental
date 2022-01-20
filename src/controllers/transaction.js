@@ -2,8 +2,7 @@ const transactionModel = require("../models/transaction");
 const responseHelper = require("../helpers/sendResponse");
 
 const postNewTransaction = (req, res) => {
-  const { body, userInfo } = req;
-  console.log("[DEBUG] userInfo", userInfo);
+  const { body } = req;
 
   transactionModel
     .postNewTransaction(body)
@@ -28,12 +27,12 @@ const updateTransactionById = (req, res) => {
 
   transactionModel
     .updateTransactionById(body, transactionId)
-    .then(({ status, result }) => {
+    .then(({ status }) => {
       responseHelper.success(res, status, {
         msg: "Data updated successfully",
         result: {
+          id: transactionId,
           ...body,
-          id: result.insertId,
         },
       });
     })
@@ -58,12 +57,15 @@ const getTransactionByVehicleType = (req, res) => {
 };
 
 const getAllTransaction = (req, res) => {
+  const { query } = req;
+
   transactionModel
-    .getAllTransaction()
+    .getAllTransaction(query)
     .then(({ status, result }) => {
       responseHelper.success(res, status, result );
     })
     .catch(({ status, err }) => {
+      console.log(err);
       responseHelper.error(res, status, err);
     });
 };
