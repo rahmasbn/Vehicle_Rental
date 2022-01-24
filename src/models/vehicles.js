@@ -1,10 +1,17 @@
 const mysql = require("mysql");
 const db = require("../config/db");
+const getTimeStamp = require("../helpers/timeStamp")
 
-
-const postNewVehicle = (newBody) => {
+const postNewVehicle = (newBody, id) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `INSERT INTO vehicles SET ?`;
+    const timeStamp = getTimeStamp()
+    // console.log(timeStamp);
+    newBody = {
+      ...newBody,
+      date_added: timeStamp,
+      user_id: id
+    }
     db.query(sqlQuery, [newBody], (err, result) => {
       if (err) return reject({ status: 500, err });
       resolve({ status: 201, result });
@@ -14,6 +21,12 @@ const postNewVehicle = (newBody) => {
 
 const updateVehicleById = (newBody, vehicleId) => {
   return new Promise((resolve, reject) => {
+    const timeStamp = getTimeStamp()
+    // console.log(timeStamp);
+    newBody = {
+      ...newBody,
+      date_added: timeStamp,
+    }
     const sqlQuery = `UPDATE vehicles SET ? WHERE id = ?`;
     db.query(sqlQuery, [newBody, vehicleId], (err, result) => {
       if (err) return reject({ status: 500, err });
@@ -25,7 +38,7 @@ const updateVehicleById = (newBody, vehicleId) => {
 
 const getVehicleByRating = (order, query) => {
   return new Promise((resolve, reject) => {
-    let sqlQuery = `SELECT v.id AS "id", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", v.image,
+    let sqlQuery = `SELECT v.id AS "id", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", v.images,
     AVG(t.rating) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
     JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating desc`;
 
@@ -85,7 +98,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
   return new Promise((resolve, reject) => {
 
     let sqlQuery = `SELECT v.id, v.name AS "vehicle", types.name AS "type", c.name AS "city", v.capacity, v.stock, 
-    v.price, v.image FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
+    v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
     const prepStatement = [];
     let data = '';
 
@@ -183,7 +196,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
 const getDetailVehicleById = (vehicleId) => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.price, v.image 
+    const sqlQuery = `SELECT v.id, v.name, types.name AS "type", v.type_id, v.city_id, c.name AS "city", v.capacity, v.stock, v.price, v.images, v.status, v.date_added, v.user_id
     FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id 
     WHERE v.id = ?`;
     db.query(sqlQuery, vehicleId, (err, result) => {

@@ -68,6 +68,7 @@ const login = (body) => {
                 token,
                 image: result[0].image,
                 roles: payload.roles,
+                id: result[0].id
               };
               resolve({ status: 200, result: data });
             }

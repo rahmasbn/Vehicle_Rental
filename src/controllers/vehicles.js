@@ -3,27 +3,39 @@ const responseHelper = require("../helpers/sendResponse");
 
 const postNewVehicle = (req, res) => {
   const { body, files } = req;
+  const { id } = req.userInfo;
+  // console.log(id)
   const imgVehicle = files;
-  let images=[];
+  let dataImg = [];
+  let newBody;
 
-  for(let i = 0; i < imgVehicle.length; i++) {
-    images += imgVehicle[i].filename + ","
+  if (imgVehicle) {
+    for (let i = 0; i < imgVehicle.length; i++) {
+      dataImg.push(imgVehicle[i].filename);
+    }
+    let photos = JSON.stringify(dataImg);
+    newBody = {
+      ...body,
+      images: photos,
+    };
   }
-  console.log(images);
-
-  const newBody = {
-    ...body,
-    images
-  };
+  // if(dataImg.length !== 0) {
+  //   const image = dataImg.map((item) => {
+  //     const filePath = `${item}`
+  //     return filePath
+  //   })
+  //   let images = JSON.stringify(image)
+  // }
+  // console.log(images);
 
   vehicleModel
-    .postNewVehicle(newBody)
+    .postNewVehicle(newBody, id)
     .then(({ status, result }) => {
       responseHelper.success(res, status, {
         msg: "Data added successfully",
-        result: {
-          ...newBody,
+        data: {
           id: result.insertId,
+          ...newBody,
         },
       });
     })
@@ -36,23 +48,23 @@ const postNewVehicle = (req, res) => {
 const updateVehicleById = (req, res) => {
   const { body, params, files } = req;
   const vehicleId = params.id;
-  // let imgVehicle = [];
-  // let images = [];
-  // for(let i = 0; i < imgVehicle.length; i++) {
-  //   images += imgVehicle[i].filename + ","
-  // }
+  const imgVehicle = files;
+  let dataImg = [];
   let newBody;
 
-  if (files) {
+  if (req.files) {
+    for (let i = 0; i < imgVehicle.length; i++) {
+      dataImg.push(imgVehicle[i].filename);
+    }
+    let photos = JSON.stringify(dataImg);
     newBody = {
       ...body,
-      id: vehicleId,
-      images: files.filename
+      images: photos,
     };
-  } else {
-    newBody = { ...body, id: vehicleId, };
-  }
 
+  } else {
+    newBody = { ...body, id: vehicleId };
+  }
   vehicleModel
     .updateVehicleById(newBody, vehicleId)
     .then(({ status }) => {
@@ -64,11 +76,12 @@ const updateVehicleById = (req, res) => {
         msg: "Data added successfully",
         result: {
           ...newBody,
+          vehicleId,
         },
       });
     })
     .catch(({ status, err }) => {
-      console.log(err)
+      console.log(err);
       responseHelper.error(res, status, err);
     });
 };
