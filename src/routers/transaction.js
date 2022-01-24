@@ -15,7 +15,9 @@ transactionRouter.patch("/:id", authorize.checkToken, transactionController.upda
 transactionRouter.get("/vehicleType", authorize.checkToken, transactionController.getTransactionByVehicleType);
 
 // All transaction
-transactionRouter.get("/", authorize.checkToken, transactionController.getAllTransaction);
+// transactionRouter.get("/", authorize.checkToken, transactionController.getAllTransaction);
+transactionRouter.get("/", authorize.checkToken, transactionController.getTransaction);
+
 
 // Detail transaction
 transactionRouter.get("/:id", authorize.checkToken, transactionController.getDetailTransactionById);

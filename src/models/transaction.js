@@ -38,12 +38,55 @@ const getTransactionByVehicleType = (order, typeId) => {
   });
 };
 
-const getAllTransaction = (query) => {
+// const getAllTransaction = (query) => {
+//   return new Promise((resolve, reject) => {
+//     let sqlQuery = `SELECT t.id, u.name AS "name", u.address AS "address", v.name AS "vehicle", v.type_id, v.city_id, 
+//     v.price AS "price", t.quantity AS "qty", t.total_payment AS "total payment", t.start_date AS "start date", 
+//     t.return_date AS "return date", t.status AS "status", t.rating AS "rating" FROM transaction t 
+//     JOIN users u ON t.user_id = u.id JOIN vehicles v ON t.vehicle_id = v.id`;
+
+//     const prepStatement = [];
+//     let data = '';
+
+//     const countQuery = `SELECT COUNT(*) AS "count" FROM transaction`;
+//     db.query(countQuery, (err, result) => {
+//       if (err) return reject({ status: 500, err });
+
+//       // Paginasi
+//       let page = parseInt(query.page);
+//       let limit = parseInt(query.limit);
+//       let offset = '';
+//       const count = result[0].count;
+      
+//       if (!query.page && !query.limit) {
+//         page = 1; limit = 3; offset = 0;
+//         sqlQuery += " LIMIT ? OFFSET ?";
+//         prepStatement.push(limit, offset);
+//       } else {
+//         sqlQuery += " LIMIT ? OFFSET ?";
+//         const offset = (page - 1) * limit;
+//         prepStatement.push(limit, offset);
+//       }
+//       const meta = {
+//         count,
+//         next: page == Math.ceil(count / limit) ? null : `/vehicles?page=${page + 1}&limit=${limit}`+data,
+//         prev: page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}`+data,
+//       };
+    
+//     db.query(sqlQuery, prepStatement, (err, result) => {
+//       if (err) return reject({ status: 500, err });
+//       resolve({ status: 200, result: { meta, data: result } });
+//     });
+//   });
+// });
+// };
+
+const getTransaction = (query,id) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT t.id, u.name AS "name", u.address AS "address", v.name AS "vehicle", v.type_id, v.city_id, 
     v.price AS "price", t.quantity AS "qty", t.total_payment AS "total payment", t.start_date AS "start date", 
     t.return_date AS "return date", t.status AS "status", t.rating AS "rating" FROM transaction t 
-    JOIN users u ON t.user_id = u.id JOIN vehicles v ON t.vehicle_id = v.id`;
+    JOIN users u ON t.user_id = u.id JOIN vehicles v ON t.vehicle_id = v.id WHERE t.user_id = ${id}`;
 
     const prepStatement = [];
     let data = '';
@@ -69,8 +112,8 @@ const getAllTransaction = (query) => {
       }
       const meta = {
         count,
-        next: page == Math.ceil(count / limit) ? null : `/vehicles?page=${page + 1}&limit=${limit}`+data,
-        prev: page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}`+data,
+        next: page == Math.ceil(count / limit) ? null : `/transaction?page=${page + 1}&limit=${limit}`+data,
+        prev: page == 1 ? null : `/transaction?page=${page - 1}&limit=${limit}`+data,
       };
     
     db.query(sqlQuery, prepStatement, (err, result) => {
@@ -80,7 +123,6 @@ const getAllTransaction = (query) => {
   });
 });
 };
-
 
 const getDetailTransactionById = (transactionId) => {
   return new Promise((resolve, reject) => {
@@ -113,7 +155,8 @@ module.exports = {
   postNewTransaction,
   updateTransactionById,
   getTransactionByVehicleType,
-  getAllTransaction,
+  // getAllTransaction,
+  getTransaction,
   getDetailTransactionById,
   deleteTransactionById,
 };

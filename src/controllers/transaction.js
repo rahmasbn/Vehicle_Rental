@@ -56,11 +56,27 @@ const getTransactionByVehicleType = (req, res) => {
     });
 };
 
-const getAllTransaction = (req, res) => {
+// const getAllTransaction = (req, res) => {
+//   const { query } = req;
+//   const { id } = req.userInfo;
+
+//   transactionModel
+//     .getAllTransaction(query)
+//     .then(({ status, result }) => {
+//       responseHelper.success(res, status, result );
+//     })
+//     .catch(({ status, err }) => {
+//       console.log(err);
+//       responseHelper.error(res, status, err);
+//     });
+// };
+const getTransaction = (req, res) => {
   const { query } = req;
+  const { id } = req.userInfo;
+
 
   transactionModel
-    .getAllTransaction(query)
+    .getTransaction(query,id)
     .then(({ status, result }) => {
       responseHelper.success(res, status, result );
     })
@@ -106,7 +122,8 @@ module.exports = {
   postNewTransaction,
   updateTransactionById,
   getTransactionByVehicleType,
-  getAllTransaction,
+  // getAllTransaction,
+  getTransaction,
   getDetailTransactionById,
   deleteTransactionById,
 };

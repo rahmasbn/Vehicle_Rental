@@ -8,7 +8,7 @@ const postNewVehicle = (req, res) => {
   const imgVehicle = files;
   let dataImg = [];
   let newBody;
-
+console.log(req.files)
   if (imgVehicle) {
     for (let i = 0; i < imgVehicle.length; i++) {
       dataImg.push(imgVehicle[i].filename);
