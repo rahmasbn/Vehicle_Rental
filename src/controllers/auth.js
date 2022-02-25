@@ -24,7 +24,7 @@ const register = (req, res) => {
 
 const login = (req, res) => {
   const { body } = req;
-
+  console.log(body);
   authModel
     .login(body)
     .then(({ status, result }) => {
