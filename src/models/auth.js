@@ -40,7 +40,7 @@ const login = (body) => {
       if (err) return reject({ status: 500, err });
       // untuk cek apakah emailnya ada di db
       if (result.length == 0)
-        return reject({ status: 401, err: "Invalid Email/Password" });
+        return reject({ status: 401, err: "Invalid Email" });
 
       try {
         const hashedPassword = result[0].password;
@@ -74,7 +74,7 @@ const login = (body) => {
             }
           );
         } else {
-          reject({ status: 401, err: "Invalid Email/Password" });
+          reject({ status: 401, err: "Invalid Password" });
         }
       } catch (err) {
         reject({ status: 500, err });
