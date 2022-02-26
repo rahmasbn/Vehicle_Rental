@@ -45,7 +45,7 @@ const login = (body) => {
       try {
         const hashedPassword = result[0].password;
         const checkPassword = await bcrypt.compare(password, hashedPassword);
-        // console.log(checkPassword);
+        console.log('cek',checkPassword);
 
         // untuk cek apakah password yang diinput sama dgn di db
         if (checkPassword) {
