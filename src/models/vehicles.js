@@ -38,7 +38,7 @@ const updateVehicleById = (newBody, vehicleId) => {
 
 const getVehicleByRating = (order, query) => {
   return new Promise((resolve, reject) => {
-    let sqlQuery = `SELECT v.id AS "id", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", v.images,
+    let sqlQuery = `SELECT v.id AS "id", v.name, types.name AS "type", c.name AS "city", v.price AS "price", v.images, v.capacity, v.stock, v.status,
     AVG(t.rating) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
     JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating`;
 
@@ -91,7 +91,9 @@ const getVehicleByRating = (order, query) => {
       const meta = {
         totalData,
         next:
-          page == Math.ceil(totalData / limit) ? null : `/vehicles/popular` + data,
+          page == Math.ceil(totalData / limit)
+            ? null
+            : `/vehicles/popular` + data,
         prev: page == 1 ? null : `/vehicles/popular` + data,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
