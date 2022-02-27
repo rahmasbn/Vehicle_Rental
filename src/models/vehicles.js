@@ -40,44 +40,58 @@ const getVehicleByRating = (order, query) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT v.id AS "id", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", v.images,
     AVG(t.rating) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
-    JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating desc`;
+    JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating`;
 
     let prepStatement = [];
     let data = "";
+    let page = parseInt(query.page);
+    let limit = parseInt(query.limit);
+    let offset = "";
 
-    // if (order){
-    //   sqlQuery += ` ?`;
-    //   prepStatement.push(mysql.raw(order));
-    //   data += `?order=${order}`
-    // }
+    if (order) {
+      sqlQuery += ` ?`;
+      prepStatement.push(mysql.raw(order));
+      data += `?order=${order}`;
+    }
 
     // prepStatement.push([mysql.raw(order)]);
 
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
+    const countQuery = `SELECT COUNT(*) AS "count" FROM transaction`;
     db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
-      let page = parseInt(query.page);
-      let limit = parseInt(query.limit);
-      // let offset = '';
-      const count = result[0].count;
+      const totalData = result[0].count;
 
       // if (!query.page && !query.limit) {
       //   page = 1; limit = 4; offset = 0;
       //   sqlQuery += " LIMIT ? OFFSET ?";
       //   prepStatement.push(limit, offset);
       // } else
-      if (query.page && query.limit) {
+      // if (query.page && query.limit) {
+      //   sqlQuery += " LIMIT ? OFFSET ?";
+      //   const offset = (page - 1) * limit;
+      //   prepStatement.push(limit, offset);
+      //   data += `?page=${page + 1}&limit=${limit}`;
+      // }
+      if (!query.page && !query.limit) {
+        page = 1;
+        limit = 100;
+        offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
-        const offset = (page - 1) * limit;
+        prepStatement.push(limit, offset);
+        data += `?page=${page + 1}&limit=${limit}`;
+      } else {
+        sqlQuery += " LIMIT ? OFFSET ?";
+        offset = (page - 1) * limit;
         prepStatement.push(limit, offset);
         data += `?page=${page + 1}&limit=${limit}`;
       }
+
       const meta = {
-        count,
+        totalData,
         next:
-          page == Math.ceil(count / limit) ? null : `/vehicles/popular` + data,
+          page == Math.ceil(totalData / limit) ? null : `/vehicles/popular` + data,
         prev: page == 1 ? null : `/vehicles/popular` + data,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
