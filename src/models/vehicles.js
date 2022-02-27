@@ -1,17 +1,17 @@
 const mysql = require("mysql");
 const db = require("../config/db");
-const getTimeStamp = require("../helpers/timeStamp")
+const getTimeStamp = require("../helpers/timeStamp");
 
 const postNewVehicle = (newBody, id) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `INSERT INTO vehicles SET ?`;
-    const timeStamp = getTimeStamp()
+    const timeStamp = getTimeStamp();
     // console.log(timeStamp);
     newBody = {
       ...newBody,
       date_added: timeStamp,
-      user_id: id
-    }
+      user_id: id,
+    };
     db.query(sqlQuery, [newBody], (err, result) => {
       if (err) return reject({ status: 500, err });
       resolve({ status: 201, result });
@@ -21,12 +21,12 @@ const postNewVehicle = (newBody, id) => {
 
 const updateVehicleById = (newBody, vehicleId) => {
   return new Promise((resolve, reject) => {
-    const timeStamp = getTimeStamp()
+    const timeStamp = getTimeStamp();
     // console.log(timeStamp);
     newBody = {
       ...newBody,
       date_added: timeStamp,
-    }
+    };
     const sqlQuery = `UPDATE vehicles SET ? WHERE id = ?`;
     db.query(sqlQuery, [newBody, vehicleId], (err, result) => {
       if (err) return reject({ status: 500, err });
@@ -43,8 +43,8 @@ const getVehicleByRating = (order, query) => {
     JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating desc`;
 
     let prepStatement = [];
-    let data = '';
-    
+    let data = "";
+
     // if (order){
     //   sqlQuery += ` ?`;
     //   prepStatement.push(mysql.raw(order));
@@ -62,13 +62,13 @@ const getVehicleByRating = (order, query) => {
       let limit = parseInt(query.limit);
       // let offset = '';
       const count = result[0].count;
-      
+
       // if (!query.page && !query.limit) {
       //   page = 1; limit = 4; offset = 0;
       //   sqlQuery += " LIMIT ? OFFSET ?";
       //   prepStatement.push(limit, offset);
       // } else
-      if(query.page && query.limit) {
+      if (query.page && query.limit) {
         sqlQuery += " LIMIT ? OFFSET ?";
         const offset = (page - 1) * limit;
         prepStatement.push(limit, offset);
@@ -76,16 +76,15 @@ const getVehicleByRating = (order, query) => {
       }
       const meta = {
         count,
-        next: page == Math.ceil(count / limit) ? null : `/vehicles/popular`+data,
-        prev: page == 1 ? null : `/vehicles/popular`+data,
+        next:
+          page == Math.ceil(count / limit) ? null : `/vehicles/popular` + data,
+        prev: page == 1 ? null : `/vehicles/popular` + data,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
         if (err) return reject({ status: 500, err });
         resolve({ status: 200, result: { meta, data: result } });
       });
     });
-    
-
 
     // db.query(sqlQuery, , (err, result) => {
     //   if (err) return reject({ status: 500, err });
@@ -96,18 +95,18 @@ const getVehicleByRating = (order, query) => {
 
 const getAllVehiclesWithOrder = (query, keyword, order) => {
   return new Promise((resolve, reject) => {
-
-    let sqlQuery = `SELECT v.id, v.name AS "vehicle", types.name AS "type", c.name AS "city", v.capacity, v.stock, 
+    let sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.status,
     v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
     const prepStatement = [];
-    let data = '';
+    let data = "";
 
     // Filter berdasrkan tipe kendaraan
     let types = "";
     if (query.type && query.type.toLowerCase() == "car") types = "car";
-    if (query.type && query.type.toLowerCase() == "motorbike") types = "motorbike";
+    if (query.type && query.type.toLowerCase() == "motorbike")
+      types = "motorbike";
     if (query.type && query.type.toLowerCase() == "bike") types = "bike";
-    
+
     // if (types) {
     //   // sqlQuery += ` WHERE types.name = ?`;
     //   prepStatement.push(types);
@@ -117,13 +116,14 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // Filter berdasrkan kota/lokasi
     let cities = "";
     if (query.city && query.city.toLowerCase() == "jakarta") cities = "jakarta";
-    if (query.city && query.city.toLowerCase() == "yogyakarta") cities = "yogyakarta";
+    if (query.city && query.city.toLowerCase() == "yogyakarta")
+      cities = "yogyakarta";
     if (query.city && query.city.toLowerCase() == "bali") cities = "bali";
     if (query.city && query.city.toLowerCase() == "malang") cities = "malang";
     if (query.city && query.city.toLowerCase() == "bandung") cities = "bandung";
     if (query.city && query.city.toLowerCase() == "bogor") cities = "bogor";
     if (query.city && query.city.toLowerCase() == "medan") cities = "medan";
-    
+
     // if (cities) {
     //   // sqlQuery += ` WHERE c.name = ?`;
     //   prepStatement.push(cities);
@@ -144,23 +144,22 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       data += `&city=${cities}`;
     }
 
-
     // Search by name
     if (keyword) {
       sqlQuery += ` AND v.name LIKE ?`;
       prepStatement.push(keyword);
       data += `&name=${query.name}`;
     }
-    
+
     let orderBy = "";
     if (query.sort && query.sort.toLowerCase() == "name") orderBy = "v.name";
     if (query.sort && query.sort.toLowerCase() == "price") orderBy = "v.price";
     if (query.sort && query.sort.toLowerCase() == "id") orderBy = "v.id";
-    
-    if (order && orderBy ){
+
+    if (order && orderBy) {
       sqlQuery += ` ORDER BY ? ?`;
       prepStatement.push(mysql.raw(orderBy), mysql.raw(order));
-      data += `&sort=${query.sort}&order=${order}`
+      data += `&sort=${query.sort}&order=${order}`;
     }
     const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
     db.query(countQuery, (err, result) => {
@@ -169,11 +168,13 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       // Paginasi
       let page = parseInt(query.page);
       let limit = parseInt(query.limit);
-      let offset = '';
+      let offset = "";
       const count = result[0].count;
-      
+
       if (!query.page && !query.limit) {
-        page = 1; limit = 1000; offset = 0;
+        page = 1;
+        limit = 1000;
+        offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
         prepStatement.push(limit, offset);
       } else {
@@ -183,8 +184,12 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       }
       const meta = {
         count,
-        next: page == Math.ceil(count / limit) ? null : `/vehicles?page=${page + 1}&limit=${limit}`+data,
-        prev: page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}`+data,
+        next:
+          page == Math.ceil(count / limit)
+            ? null
+            : `/vehicles?page=${page + 1}&limit=${limit}` + data,
+        prev:
+          page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}` + data,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
         if (err) return reject({ status: 500, err });
@@ -225,4 +230,3 @@ module.exports = {
   getDetailVehicleById,
   deleteVehicleById,
 };
-
