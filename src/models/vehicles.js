@@ -99,6 +99,9 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
     const prepStatement = [];
     let data = "";
+    let page = parseInt(query.page);
+    let limit = parseInt(query.limit);
+    let offset = "";
 
     // Filter berdasrkan tipe kendaraan
     let types = "";
@@ -161,14 +164,22 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       prepStatement.push(mysql.raw(orderBy), mysql.raw(order));
       data += `&sort=${query.sort}&order=${order}`;
     }
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
-    db.query(countQuery, (err, result) => {
+
+    // prepare
+    const prepare = [
+      types,
+      cities,
+      keyword,
+      mysql.raw(orderBy),
+      mysql.raw(order),
+    ];
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id 
+    WHERE types.name = ? AND c.name = ? AND v.name LIKE ? ORDER BY ? ?`;
+    db.query(countQuery, prepare, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
-      let page = parseInt(query.page);
-      let limit = parseInt(query.limit);
-      let offset = "";
+
       const totalData = result[0].count;
 
       if (!query.page && !query.limit) {
@@ -187,7 +198,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       const meta = {
         totalData,
         next:
-          page == parseInt(offset) + limit >= totalData
+          page == Math.ceil(totalData / limit)
             ? null
             : `/vehicles?page=${page + 1}&limit=${limit}` + data,
         prev:
