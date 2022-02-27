@@ -207,7 +207,7 @@ const getVehicleByType = (query, type) => {
     let sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.status,
     v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id WHERE types.name = ?`;
 
-    const prepStatement = [];
+    const prepStatement = [type];
     let page = parseInt(query.page);
     let limit = parseInt(query.limit);
     let offset = "";
