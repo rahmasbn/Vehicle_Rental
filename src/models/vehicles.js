@@ -169,7 +169,8 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       let page = parseInt(query.page);
       let limit = parseInt(query.limit);
       let offset = "";
-      const count = result[0].count;
+      const totalData = result[0].count;
+      const nextOffset = parseInt(offset) + limit;
 
       if (!query.page && !query.limit) {
         page = 1;
@@ -183,9 +184,9 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
         prepStatement.push(limit, offset);
       }
       const meta = {
-        count,
+        totalData,
         next:
-          page == Math.ceil(count / limit)
+          page == nextOffset >= totalData
             ? null
             : `/vehicles?page=${page + 1}&limit=${limit}` + data,
         prev:
