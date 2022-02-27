@@ -39,7 +39,7 @@ const updateVehicleById = (newBody, vehicleId) => {
 const getVehicleByRating = (order, query) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT v.id AS "id", v.name, types.name AS "type", c.name AS "city", v.price AS "price", v.images, v.capacity, v.stock, v.status,
-    AVG(t.rating) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
+    CAST(AVG(t.rating) AS DECIMAL(2,1)) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
     JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating`;
 
     let prepStatement = [];
