@@ -25,13 +25,13 @@ vehicleRouter.patch(
 );
 
 vehicleRouter.get("/popular", vehicleController.getVehicleByRating);
+// Detail Vehicles
+vehicleRouter.get("/:id", vehicleController.getDetailVehicleById);
 vehicleRouter.get("/:type", vehicleController.getVehicleByType);
 
 // All vehicles
 vehicleRouter.get("/", vehicleController.getAllVehiclesWithOrder);
 
-// Detail Vehicles
-vehicleRouter.get("/:id", vehicleController.getDetailVehicleById);
 
 // Delete vehicle by id
 vehicleRouter.delete(
