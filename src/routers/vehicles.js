@@ -25,9 +25,9 @@ vehicleRouter.patch(
 );
 
 vehicleRouter.get("/popular", vehicleController.getVehicleByRating);
-// Detail Vehicles
-vehicleRouter.get("/:id", vehicleController.getDetailVehicleById);
 vehicleRouter.get("/:type", vehicleController.getVehicleByType);
+// Detail Vehicles
+vehicleRouter.get("/detail/:id", vehicleController.getDetailVehicleById);
 
 // All vehicles
 vehicleRouter.get("/", vehicleController.getAllVehiclesWithOrder);

@@ -135,7 +135,7 @@ const getDetailVehicleById = (req, res) => {
   vehicleModel
     .getDetailVehicleById(vehicleId)
     .then(({ status, result }) => {
-      console.log('result', result)
+      // console.log('result', result)
       if (status == 404)
         return responseHelper.success(res, status, {
           msg: "Kendaraan tidak ditemukan",
