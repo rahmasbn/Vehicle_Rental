@@ -179,13 +179,15 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
         prepStatement.push(limit, offset);
       } else {
         sqlQuery += " LIMIT ? OFFSET ?";
-        const offset = (page - 1) * limit;
+        offset += (page - 1) * limit;
         prepStatement.push(limit, offset);
       }
+
+      console.log("offset", offset);
       const meta = {
         totalData,
         next:
-          page == (offset + limit) >= totalData
+          page == parseInt(offset) + limit >= totalData
             ? null
             : `/vehicles?page=${page + 1}&limit=${limit}` + data,
         prev:
