@@ -165,20 +165,11 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       data += `&sort=${query.sort}&order=${order}`;
     }
 
-    // prepare
-    // const prepare = [
-    //   types,
-    //   cities,
-    //   keyword,
-    //   mysql.raw(orderBy),
-    //   mysql.raw(order),
-    // ];
     const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
     db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
-
       const totalData = result[0].count;
 
       if (!query.page && !query.limit) {
@@ -193,7 +184,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
         prepStatement.push(limit, offset);
       }
 
-      console.log("offset", offset);
+      // console.log("offset", offset);
       const meta = {
         totalData,
         next:
@@ -202,6 +193,53 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
             : `/vehicles?page=${page + 1}&limit=${limit}` + data,
         prev:
           page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}` + data,
+      };
+      db.query(sqlQuery, prepStatement, (err, result) => {
+        if (err) return reject({ status: 500, err });
+        resolve({ status: 200, result: { meta, data: result } });
+      });
+    });
+  });
+};
+
+const getVehicleByType = (query, type) => {
+  return new Promise((resolve, reject) => {
+    let sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.status,
+    v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id WHERE types.name = ?`;
+
+    const prepStatement = [];
+    let page = parseInt(query.page);
+    let limit = parseInt(query.limit);
+    let offset = "";
+
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id WHERE types.name = ?`;
+    db.query(countQuery, type, (err, result) => {
+      if (err) return reject({ status: 500, err });
+
+      const totalData = result[0].count;
+
+      if (!query.page && !query.limit) {
+        page = 1;
+        limit = 100;
+        offset = 0;
+        sqlQuery += " LIMIT ? OFFSET ?";
+        prepStatement.push(limit, offset);
+      } else {
+        sqlQuery += " LIMIT ? OFFSET ?";
+        offset = (page - 1) * limit;
+        prepStatement.push(limit, offset);
+      }
+
+      const meta = {
+        totalData,
+        next:
+          page == Math.ceil(totalData / limit)
+            ? null
+            : `/vehicles/${type}?page=${page + 1}&limit=${limit}`,
+        prev:
+          page == 1
+            ? null
+            : `/vehicles/${type}?page=${page - 1}&limit=${limit}`,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
         if (err) return reject({ status: 500, err });
@@ -238,6 +276,7 @@ module.exports = {
   postNewVehicle,
   updateVehicleById,
   getVehicleByRating,
+  getVehicleByType,
   getAllVehiclesWithOrder,
   getDetailVehicleById,
   deleteVehicleById,

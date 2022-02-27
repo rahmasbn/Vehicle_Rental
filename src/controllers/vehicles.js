@@ -8,7 +8,7 @@ const postNewVehicle = (req, res) => {
   const imgVehicle = files;
   let dataImg = [];
   let newBody;
-console.log(req.files)
+  console.log(req.files);
   if (imgVehicle) {
     for (let i = 0; i < imgVehicle.length; i++) {
       dataImg.push(imgVehicle[i].filename);
@@ -61,7 +61,6 @@ const updateVehicleById = (req, res) => {
       ...body,
       images: photos,
     };
-
   } else {
     newBody = { ...body, id: vehicleId };
   }
@@ -92,6 +91,20 @@ const getVehicleByRating = (req, res) => {
 
   vehicleModel
     .getVehicleByRating(order, query)
+    .then(({ status, result }) => {
+      responseHelper.success(res, status, result);
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, err);
+    });
+};
+
+const getVehicleByType = (req, res) => {
+  const { type } = req.params;
+  const { query } = req;
+
+  vehicleModel
+    .getVehicleByType(query, type)
     .then(({ status, result }) => {
       responseHelper.success(res, status, result);
     })
@@ -152,6 +165,7 @@ module.exports = {
   updateVehicleById,
   getVehicleByRating,
   getAllVehiclesWithOrder,
+  getVehicleByType,
   getDetailVehicleById,
   deleteVehicleById,
 };
