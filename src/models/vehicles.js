@@ -166,16 +166,15 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     }
 
     // prepare
-    const prepare = [
-      types,
-      cities,
-      keyword,
-      mysql.raw(orderBy),
-      mysql.raw(order),
-    ];
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id 
-    WHERE types.name = ? AND c.name = ? AND v.name LIKE ? ORDER BY ? ?`;
-    db.query(countQuery, prepare, (err, result) => {
+    // const prepare = [
+    //   types,
+    //   cities,
+    //   keyword,
+    //   mysql.raw(orderBy),
+    //   mysql.raw(order),
+    // ];
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
+    db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
