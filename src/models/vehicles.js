@@ -179,7 +179,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
         prepStatement.push(limit, offset);
       } else {
         sqlQuery += " LIMIT ? OFFSET ?";
-        offset += (page - 1) * limit;
+        offset = (page - 1) * limit;
         prepStatement.push(limit, offset);
       }
 
