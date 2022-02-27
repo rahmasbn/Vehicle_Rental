@@ -56,7 +56,7 @@ const getVehicleByRating = (order, query) => {
 
     // prepStatement.push([mysql.raw(order)]);
 
-    const countQuery = `SELECT COUNT(*) AS "count" FROM transaction`;
+    const countQuery = `SELECT COUNT(*) AS "count" from (SELECT AVG(t.rating) AS "rating" from transaction t group by t.vehicle_id) as x`;
     db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
 
@@ -85,7 +85,7 @@ const getVehicleByRating = (order, query) => {
         sqlQuery += " LIMIT ? OFFSET ?";
         offset = (page - 1) * limit;
         prepStatement.push(limit, offset);
-        data += `?page=${page + 1}&limit=${limit}`;
+        data += `?page=${page - 1}&limit=${limit}`;
       }
 
       const meta = {
