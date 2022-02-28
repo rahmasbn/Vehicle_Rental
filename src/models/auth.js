@@ -45,7 +45,7 @@ const login = (body) => {
       try {
         const hashedPassword = result[0].password;
         const checkPassword = await bcrypt.compare(password, hashedPassword);
-        console.log('cek',checkPassword);
+        console.log("cek", checkPassword);
 
         // untuk cek apakah password yang diinput sama dgn di db
         if (checkPassword) {
@@ -55,7 +55,7 @@ const login = (body) => {
             roles: result[0].roles_id,
           };
           const jwtOptions = {
-            expiresIn: "30m",
+            expiresIn: "24h",
             issuer: process.env.ISSUER,
           };
           jwt.sign(
@@ -68,7 +68,7 @@ const login = (body) => {
                 token,
                 image: result[0].image,
                 roles: payload.roles,
-                id: result[0].id
+                id: result[0].id,
               };
               resolve({ status: 200, result: data });
             }
