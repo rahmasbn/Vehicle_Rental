@@ -31,9 +31,23 @@ const login = (req, res) => {
       responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
-      console.log('err', err)
+      console.log("err", err);
       responseHelper.error(res, status, err);
     });
 };
 
-module.exports = { register, login };
+const logout = (req, res) => {
+  const token = req.header("x-access-token");
+  authModel
+    .logout(token)
+    .then(({ status }) => {
+      return responseHelper.success(res, status, {
+        msg: "Logout successful",
+      });
+    })
+    .catch(({ status, err }) => {
+      responseHelper.error(res, status, err);
+    });
+};
+
+module.exports = { register, login, logout };

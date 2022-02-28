@@ -83,4 +83,15 @@ const login = (body) => {
   });
 };
 
-module.exports = { register, login };
+const logout = (token) => {
+  return new Promise((resolve, reject) => {
+    const sqlQuery = `INSERT INTO blacklist_token (token) VALUES (?)`;
+
+    db.query(sqlQuery, [token], (err, result) => {
+      if (err) return reject({ status: 500, err });
+      resolve({ status: 200, result });
+    });
+  });
+};
+
+module.exports = { register, login, logout };
