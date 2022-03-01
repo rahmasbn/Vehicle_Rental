@@ -3,6 +3,7 @@ const db = require("../config/db");
 
 const postNewTransaction = (body) => {
   return new Promise((resolve, reject) => {
+    const sqlQuery = `INSERT INTO transaction SET ?`;
     const newBody = {
       user_id: body.user_id,
       vehicle_id: body.vehicle_id,
@@ -11,7 +12,6 @@ const postNewTransaction = (body) => {
       start_date: body.start_date,
       return_date: body.return_date,
     };
-    const sqlQuery = `INSERT INTO transaction SET ?`;
     db.query(sqlQuery, [newBody], (err, result) => {
       if (err) return reject({ status: 500, err });
       resolve({ status: 201, result });
