@@ -142,7 +142,7 @@ const getDetailTransactionById = (transactionId) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `SELECT t.id, u.name AS "name", u.email AS "email", u.phone_number AS "phone_number", 
     u.address AS "address", v.name AS "vehicle", types.name AS "type", c.name AS "city", v.price AS "price", 
-    t.quantity AS "qty", t.total_payment, t.start_date, t.return_date, 
+    t.quantity AS "qty", t.total_payment, t.start_date, t.return_date, v.image, 
     t.status AS "status", t.rating AS "rating" FROM transaction t JOIN users u ON t.user_id = u.id 
     JOIN vehicles v ON t.vehicle_id = v.id JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id 
     WHERE t.id = ${transactionId}`;
