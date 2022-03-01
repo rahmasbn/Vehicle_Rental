@@ -1,9 +1,11 @@
 const mysql = require("mysql");
 const db = require("../config/db");
+const getTimeStamp = require("../helpers/timeStamp");
 
 const postNewTransaction = (body) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `INSERT INTO transaction SET ?`;
+    const timeStamp = getTimeStamp();
     const newBody = {
       user_id: body.user_id,
       vehicle_id: body.vehicle_id,
@@ -11,6 +13,7 @@ const postNewTransaction = (body) => {
       total_payment: body.total_payment,
       start_date: body.start_date,
       return_date: body.return_date,
+      date_added: timeStamp
     };
     db.query(sqlQuery, [newBody], (err, result) => {
       if (err) return reject({ status: 500, err });
