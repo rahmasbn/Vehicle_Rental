@@ -3,6 +3,7 @@ const responseHelper = require("../helpers/sendResponse");
 
 const postNewTransaction = (req, res) => {
   const { body } = req;
+  // const { id } = req.userInfo;
 
   transactionModel
     .postNewTransaction(body)
@@ -49,7 +50,7 @@ const getTransactionByVehicleType = (req, res) => {
   transactionModel
     .getTransactionByVehicleType(order, typeId)
     .then(({ status, result }) => {
-      responseHelper.success(res, status, result );
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
       responseHelper.error(res, status, err);
@@ -74,11 +75,10 @@ const getTransaction = (req, res) => {
   const { query } = req;
   const { id } = req.userInfo;
 
-
   transactionModel
-    .getTransaction(query,id)
+    .getTransaction(query, id)
     .then(({ status, result }) => {
-      responseHelper.success(res, status, result );
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
       console.log(err);
@@ -97,7 +97,7 @@ const getDetailTransactionById = (req, res) => {
         return responseHelper.success(res, status, {
           msg: "Transaksi tidak ditemukan",
         });
-      responseHelper.success(res, status, result );
+      responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
       responseHelper.error(res, status, err);
