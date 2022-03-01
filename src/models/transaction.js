@@ -7,12 +7,7 @@ const postNewTransaction = (body) => {
     const sqlQuery = `INSERT INTO transaction SET ?`;
     const timeStamp = getTimeStamp();
     const newBody = {
-      user_id: body.user_id,
-      vehicle_id: body.vehicle_id,
-      quantity: body.quantity,
-      total_payment: body.total_payment,
-      start_date: body.start_date,
-      return_date: body.return_date,
+      ...body,
       date_added: timeStamp
     };
     db.query(sqlQuery, [newBody], (err, result) => {
