@@ -8,7 +8,7 @@ const postNewTransaction = (body) => {
     const timeStamp = getTimeStamp();
     const newBody = {
       ...body,
-      date_added: timeStamp
+      date_added: timeStamp,
     };
     db.query(sqlQuery, [newBody], (err, result) => {
       if (err) return reject({ status: 500, err });
@@ -109,7 +109,7 @@ const getTransaction = (query, id) => {
 
       if (!query.page && !query.limit) {
         page = 1;
-        limit = 3;
+        limit = 8;
         offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
         prepStatement.push(limit, offset);
@@ -121,7 +121,7 @@ const getTransaction = (query, id) => {
       const meta = {
         count,
         next:
-          page == Math.ceil(count / limit)
+          page == Math.ceil(count / limit) || count == 0
             ? null
             : `/transaction?page=${page + 1}&limit=${limit}` + data,
         prev:
