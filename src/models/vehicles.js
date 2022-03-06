@@ -118,7 +118,6 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     let page = parseInt(query.page);
     let limit = parseInt(query.limit);
     let offset = "";
-    let countQuery = "";
 
     // Filter berdasrkan tipe kendaraan
     let types = "";
@@ -152,7 +151,6 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
     if (types && cities) {
       sqlQuery += ` WHERE types.name = ? AND c.name = ?`;
-      countQuery += ` WHERE types.name = ? AND c.name = ?`;
       prepStatement.push(types, cities);
       data += `&type=${types}&city=${cities}`;
     } else if (types) {
@@ -168,7 +166,6 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // Search by name
     if (keyword) {
       sqlQuery += ` AND v.name LIKE ?`;
-      countQuery += ` AND v.name LIKE ?`;
       prepStatement.push(keyword);
       data += `&name=${query.name}`;
     }
@@ -180,13 +177,12 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
     if (order && orderBy) {
       sqlQuery += ` ORDER BY ? ?`;
-      countQuery += ` ORDER BY ? ?`;
       prepStatement.push(mysql.raw(orderBy), mysql.raw(order));
       data += `&sort=${query.sort}&order=${order}`;
     }
 
-    countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
-    db.query(countQuery, prepStatement, (err, result) => {
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
+    db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
