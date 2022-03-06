@@ -167,7 +167,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     if (keyword) {
       sqlQuery += ` AND v.name LIKE ?`;
       prepStatement.push(keyword);
-      data += `&name=${query.name}`;
+      data += `&keyword=${query.keyword}`;
     }
 
     let orderBy = "";
@@ -181,8 +181,11 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       data += `&sort=${query.sort}&order=${order}`;
     }
 
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
-    db.query(countQuery, (err, result) => {
+    const prepare = [types, cities, keyword]
+
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id
+    WHERE c.name LIKE ? AND types.name LIKE ? AND v.name LIKE ? AND concat(v.name, c.name, types.name) LIKE ?`;
+    db.query(countQuery, prepare, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
@@ -190,7 +193,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
       if (!query.page && !query.limit) {
         page = 1;
-        limit = 1000;
+        limit = 8;
         offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
         prepStatement.push(limit, offset);
