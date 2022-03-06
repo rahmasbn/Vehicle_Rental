@@ -124,6 +124,7 @@ const getAllVehiclesWithOrder = (req, res) => {
       responseHelper.success(res, status, result);
     })
     .catch(({ status, err }) => {
+      console.log(err);
       responseHelper.error(res, status, err);
     });
 };
