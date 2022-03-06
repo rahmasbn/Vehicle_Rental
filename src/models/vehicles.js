@@ -150,8 +150,8 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // }
 
     if (types && cities) {
-      sqlQuery += ` WHERE types.name LIKE %?% AND c.name LIKE %?%`;
-      prepStatement.push(types, cities);
+      sqlQuery += ` WHERE types.name LIKE ? AND c.name LIKE ?`;
+      prepStatement.push(`%${types}%`, `%${cities}%`);
       data += `&type=${types}&city=${cities}`;
     } else if (types) {
       sqlQuery += ` WHERE types.name = ?`;
