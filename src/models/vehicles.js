@@ -113,6 +113,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.status,
     v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
+    let countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
     const prepStatement = [];
     let data = "";
     let page = parseInt(query.page);
@@ -151,14 +152,17 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
     if (types && cities) {
       sqlQuery += ` WHERE types.name LIKE ? AND c.name LIKE ?`;
+      countQuery += ` WHERE types.name LIKE ? AND c.name LIKE ?`;
       prepStatement.push(`%${types}%`, `%${cities}%`);
       data += `&type=${types}&city=${cities}`;
     } else if (types) {
       sqlQuery += ` WHERE types.name LIKE ?`;
+      countQuery += ` WHERE types.name LIKE ?`;
       prepStatement.push(`%${types}%`);
       data += `&type=${types}`;
     } else if (cities) {
       sqlQuery += ` WHERE c.name LIKE ?`;
+      countQuery += ` WHERE c.name LIKE ?`;
       prepStatement.push(`%${cities}%`);
       data += `&city=${cities}`;
     }
@@ -166,6 +170,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // Search by name
     if (keyword) {
       sqlQuery += ` AND v.name LIKE ?`;
+      countQuery += ` AND v.name LIKE ?`;
       prepStatement.push(keyword);
       data += `&name=${query.name}`;
     }
@@ -177,12 +182,12 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
     if (order && orderBy) {
       sqlQuery += ` ORDER BY ? ?`;
+      countQuery += ` ORDER BY ? ?`;
       prepStatement.push(mysql.raw(orderBy), mysql.raw(order));
       data += `&sort=${query.sort}&order=${order}`;
     }
 
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id
-    WHERE concat(v.name, c.name, types.name) LIKE ?`;
+    
     db.query(countQuery, prepStatement, (err, result) => {
       if (err) return reject({ status: 500, err });
 
