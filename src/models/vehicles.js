@@ -182,8 +182,8 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     }
 
     const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id
-    WHERE concat(v.name, c.name, types.name) ?`;
-    db.query(countQuery, (err, result) => {
+    WHERE concat(v.name, c.name, types.name) LIKE ?`;
+    db.query(countQuery, prepStatement, (err, result) => {
       if (err) return reject({ status: 500, err });
 
       // Paginasi
