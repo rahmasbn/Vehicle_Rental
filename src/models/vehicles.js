@@ -154,12 +154,12 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       prepStatement.push(`%${types}%`, `%${cities}%`);
       data += `&type=${types}&city=${cities}`;
     } else if (types) {
-      sqlQuery += ` WHERE types.name = ?`;
-      prepStatement.push(types);
+      sqlQuery += ` WHERE types.name LIKE ?`;
+      prepStatement.push(`%${types}%`);
       data += `&type=${types}`;
     } else if (cities) {
       sqlQuery += ` WHERE c.name = ?`;
-      prepStatement.push(cities);
+      prepStatement.push(`%${cities}%`);
       data += `&city=${cities}`;
     }
 
@@ -181,7 +181,8 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       data += `&sort=${query.sort}&order=${order}`;
     }
 
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles`;
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id
+    WHERE concat(v.name, c.name, type) LIKE ?`;
     db.query(countQuery, (err, result) => {
       if (err) return reject({ status: 500, err });
 
