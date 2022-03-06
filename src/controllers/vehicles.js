@@ -115,7 +115,7 @@ const getVehicleByType = (req, res) => {
 
 const getAllVehiclesWithOrder = (req, res) => {
   const { query } = req;
-  const order = query.sort;
+  const order = query.order;
   let keyword = "";
   if (query.keyword) keyword = `%${query.keyword}%`;
   vehicleModel
