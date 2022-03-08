@@ -15,13 +15,10 @@ const register = (req, res) => {
       };
       responseHelper.success(res, status, objResponse);
     })
-    .catch(({ status }) => {
-      // console.log(err);
-      if (status == 400)
-        return responseHelper.error(res, status, {
-          msg: "Email already exist",
-        });
-      responseHelper.error(res, status);
+    .catch(({ status, err }) => {
+      console.log(err);
+      if (status == 400) return responseHelper.error(res, status, err);
+      responseHelper.error(res, status, err);
     });
 };
 
