@@ -122,10 +122,9 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 
     // Filter berdasrkan tipe kendaraan
     let types = "";
-    if (query.type && query.type.toLowerCase() == "car") types = "car";
-    if (query.type && query.type.toLowerCase() == "motorbike")
-      types = "motorbike";
-    if (query.type && query.type.toLowerCase() == "bike") types = "bike";
+    if (query.type && query.type.toLowerCase() === "car") types = "car";
+    if (query.type && query.type.toLowerCase() === "motorbike") types = "motorbike";
+    if (query.type && query.type.toLowerCase() === "bike") types = "bike";
 
     // if (types) {
     //   // sqlQuery += ` WHERE types.name = ?`;
@@ -187,7 +186,6 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       data += `&sort=${query.sort}&order=${order}`;
     }
 
-    
     db.query(countQuery, prepStatement, (err, result) => {
       if (err) return reject({ status: 500, err });
 
