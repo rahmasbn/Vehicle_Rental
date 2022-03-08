@@ -150,19 +150,19 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // }
 
     if (types && cities) {
-      sqlQuery += ` WHERE types.name LIKE ? AND c.name LIKE ?`;
-      countQuery += ` WHERE types.name LIKE ? AND c.name LIKE ?`;
-      prepStatement.push(`%${types}%`, `%${cities}%`);
+      sqlQuery += ` WHERE types.name = ? AND c.name = ?`;
+      countQuery += ` WHERE types.name = ? AND c.name = ?`;
+      prepStatement.push(types, cities);
       data += `&type=${types}&city=${cities}`;
     } else if (types) {
-      sqlQuery += ` WHERE types.name LIKE ?`;
-      countQuery += ` WHERE types.name LIKE ?`;
-      prepStatement.push(`%${types}%`);
+      sqlQuery += ` WHERE types.name = ?`;
+      countQuery += ` WHERE types.name = ?`;
+      prepStatement.push(types);
       data += `&type=${types}`;
     } else if (cities) {
-      sqlQuery += ` WHERE c.name LIKE ?`;
-      countQuery += ` WHERE c.name LIKE ?`;
-      prepStatement.push(`%${cities}%`);
+      sqlQuery += ` WHERE c.name = ?`;
+      countQuery += ` WHERE c.name = ?`;
+      prepStatement.push(cities);
       data += `&city=${cities}`;
     }
 
