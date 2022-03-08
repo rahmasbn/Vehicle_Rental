@@ -17,7 +17,10 @@ const register = (req, res) => {
     })
     .catch(({ status, err }) => {
       console.log(err);
-      if (status == 400) return responseHelper.error(res, status, err);
+      if (status == 400)
+        return responseHelper.error(res, status, {
+          msg: "Email already exist",
+        });
       responseHelper.error(res, status, err);
     });
 };

@@ -8,7 +8,7 @@ const register = (body, email) => {
     db.query(registerEmail, [email], (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.length >= 1)
-        return reject({ status: 400, err: {msg: "Duplicated Email" }});
+        return reject({ status: 400, err });
 
       const sqlQuery = "INSERT INTO users SET ?";
       bcrypt
