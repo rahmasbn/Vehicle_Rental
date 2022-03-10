@@ -25,7 +25,7 @@ const uploads = multer({
             return cb(new Error("Only .png, .jpg and .jpeg format allowed!"))
         }
     },
-    limits: { fileSize: 2 * 1024 * 1024 }     //2Mb
+    limits: { fileSize: 3 * 1024 * 1024 }     //3Mb
 });
 
 const single = uploads.single("image");
