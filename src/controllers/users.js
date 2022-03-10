@@ -45,6 +45,7 @@ const updateProfile = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
+      console.log("err update profile", err);
       responseHelper.error(res, status, err);
     });
 };
@@ -63,8 +64,7 @@ const updatePassword = (req, res) => {
     })
     .catch(({ status, err }) => {
       if (status == 401)
-        return responseHelper.error(res, status, "Current Password is invalid",
-        );
+        return responseHelper.error(res, status, "Current Password is invalid");
       responseHelper.error(res, status, err);
     });
 };
