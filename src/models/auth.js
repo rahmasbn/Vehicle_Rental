@@ -94,4 +94,86 @@ const logout = (token) => {
   });
 };
 
-module.exports = { register, login, logout };
+const forgotPassword = (body) => {
+  return new Promise((resolve, reject) => {
+    const { email } = body;
+    const sqlQuery = `SELECT * FROM users WHERE email = ?`;
+
+    db.query(sqlQuery, [email], (err, result) => {
+      if (err) return reject({ status: 500, err });
+      if (result.length == 0)
+        return reject({
+          status: 401,
+          result: { errMsg: "Invalid Email" },
+        });
+
+      const otp = Math.ceil(Math.random() * 1000000);
+      console.log("OTP ", otp);
+
+      const sqlQuery = `UPDATE users SET otp = ? WHERE email = ?`;
+      db.query(sqlQuery, [otp, email], (err) => {
+        if (err) return reject({ status: 500, err });
+        const data = {
+          email: email,
+        };
+
+        resolve({ status: 200, result: data });
+      });
+    });
+  });
+};
+
+const checkOTP = (body) => {
+  return new Promise((resolve, reject) => {
+    const { email, otp } = body;
+    const sqlQuery = `SELECT email, otp FROM users WHERE email = ? AND otp = ?`;
+
+    db.query(sqlQuery, [email, otp], (err, result) => {
+      if (err) return reject({ status: 500, err });
+      if (result.length === 0)
+        return reject({ status: 401, err: "Invalid OTP" });
+      const data = {
+        email: email,
+      };
+      resolve({ status: 200, result: data });
+    });
+  });
+};
+
+const resetPassword = (body) => {
+  return new Promise((resolve, reject) => {
+    const { email, password, otp } = body;
+    const sqlQuery = `SELECT * FROM users WHERE email = ? AND otp = ?`;
+
+    db.query(sqlQuery, [email, otp], (err) => {
+      if (err) return reject({ status: 500, err });
+
+      const sqlUpdatePass = `UPDATE users SET password = ? WHERE email = ? AND otp =?`;
+      bcrypt
+        .hash(password, 10)
+        .then((hashedPassword) => {
+          db.query(sqlUpdatePass, [hashedPassword, email, otp], (err) => {
+            if (err) return reject({ status: 500, err });
+
+            const sqlUpdateOTP = `UPDATE users SET otp = null WHERE email = ?`;
+            db.query(sqlUpdateOTP, [email], (err, result) => {
+              if (err) return reject({ status: 500, err });
+              resolve({ status: 201, result });
+            });
+          });
+        })
+        .catch((err) => {
+          reject({ status: 500, err });
+        });
+    });
+  });
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  forgotPassword,
+  checkOTP,
+  resetPassword,
+};
