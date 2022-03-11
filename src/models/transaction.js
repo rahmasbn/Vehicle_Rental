@@ -92,7 +92,7 @@ const getTransaction = (query, id) => {
     let sqlQuery = `SELECT t.id, u.name AS "name", u.address AS "address", v.name AS "vehicle", v.type_id, v.city_id, v.images, 
     v.price AS "price", t.quantity AS "qty", t.total_payment, t.start_date,
     t.return_date, t.status, t.rating FROM transaction t 
-    JOIN users u ON t.user_id = u.id JOIN vehicles v ON t.vehicle_id = v.id WHERE t.user_id = ${id}`;
+    JOIN users u ON t.user_id = u.id JOIN vehicles v ON t.vehicle_id = v.id WHERE t.user_id = ${id} ORDER BY t.id DESC`;
 
     const prepStatement = [];
     let data = "";
