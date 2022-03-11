@@ -102,10 +102,7 @@ const forgotPassword = (body) => {
     db.query(sqlQuery, [email], (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.length == 0)
-        return reject({
-          status: 401,
-          result: { errMsg: "Invalid Email" },
-        });
+        return reject({ status: 401, err: "Invalid Email" });
 
       const otp = Math.ceil(Math.random() * 1000000);
       console.log("OTP ", otp);
