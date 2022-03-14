@@ -17,6 +17,7 @@ const postNewTransaction = (req, res) => {
       });
     })
     .catch(({ status, err }) => {
+      console.log(err);
       responseHelper.error(res, status, err);
     });
 };
