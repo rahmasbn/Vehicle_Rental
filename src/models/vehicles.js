@@ -171,7 +171,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
       sqlQuery += ` AND v.name LIKE ?`;
       countQuery += ` AND v.name LIKE ?`;
       prepStatement.push(keyword);
-      data += `&keyword=${query.name}`;
+      data += `&keyword=${keyword}`;
     }
 
     let orderBy = "";
