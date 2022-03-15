@@ -40,7 +40,7 @@ const getVehicleByRating = (order, query) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT v.id AS "id", v.name, types.name AS "type", c.name AS "city", v.price AS "price", v.images, v.capacity, v.stock, v.status,
     CAST(AVG(t.rating) AS DECIMAL(2,1)) AS "rating" FROM transaction t JOIN vehicles v ON t.vehicle_id = v.id JOIN cities c ON v.city_id = c.id
-    JOIN types ON v.type_id = types.id GROUP BY t.vehicle_id ORDER BY rating`;
+    JOIN types ON v.type_id = types.id WHERE deleted_at IS NULL GROUP BY t.vehicle_id ORDER BY rating`;
 
     let prepStatement = [];
     let data = "";
@@ -113,7 +113,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.status,
     v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
-    let countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id`;
+    let countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id WHERE deleted_at IS NULL`;
     const prepStatement = [];
     let data = "";
     let page = parseInt(query.page);
@@ -123,7 +123,8 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // Filter berdasrkan tipe kendaraan
     let types = "";
     if (query.type && query.type.toLowerCase() === "car") types = "car";
-    if (query.type && query.type.toLowerCase() === "motorbike") types = "motorbike";
+    if (query.type && query.type.toLowerCase() === "motorbike")
+      types = "motorbike";
     if (query.type && query.type.toLowerCase() === "bike") types = "bike";
 
     // if (types) {
@@ -150,18 +151,18 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
     // }
 
     if (types && cities) {
-      sqlQuery += ` WHERE types.name = ? AND c.name = ?`;
-      countQuery += ` WHERE types.name = ? AND c.name = ?`;
+      sqlQuery += ` AND types.name = ? AND c.name = ?`;
+      countQuery += ` AND types.name = ? AND c.name = ?`;
       prepStatement.push(types, cities);
       data += `&type=${types}&city=${cities}`;
     } else if (types) {
-      sqlQuery += ` WHERE types.name = ?`;
-      countQuery += ` WHERE types.name = ?`;
+      sqlQuery += ` AND types.name = ?`;
+      countQuery += ` AND types.name = ?`;
       prepStatement.push(types);
       data += `&type=${types}`;
     } else if (cities) {
-      sqlQuery += ` WHERE c.name = ?`;
-      countQuery += ` WHERE c.name = ?`;
+      sqlQuery += ` AND c.name = ?`;
+      countQuery += ` AND c.name = ?`;
       prepStatement.push(cities);
       data += `&city=${cities}`;
     }
@@ -225,14 +226,14 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
 const getVehicleByType = (query, type) => {
   return new Promise((resolve, reject) => {
     let sqlQuery = `SELECT v.id, v.name, types.name AS "type", c.name AS "city", v.capacity, v.stock, v.status,
-    v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id WHERE types.name = ?`;
+    v.price, v.images FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id WHERE types.name = ? AND deleted_at IS NULL`;
 
     const prepStatement = [type];
     let page = parseInt(query.page);
     let limit = parseInt(query.limit);
     let offset = "";
 
-    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id WHERE types.name = ?`;
+    const countQuery = `SELECT COUNT(*) AS "count" FROM vehicles v JOIN types ON v.type_id = types.id WHERE types.name = ? AND deleted_at IS NULL`;
     db.query(countQuery, type, (err, result) => {
       if (err) return reject({ status: 500, err });
 
@@ -273,7 +274,7 @@ const getDetailVehicleById = (vehicleId) => {
   return new Promise((resolve, reject) => {
     const sqlQuery = `SELECT v.id, v.name, types.name AS "type", v.type_id, v.city_id, c.name AS "city", v.capacity, v.stock, v.price, v.images, v.status, v.date_added, v.user_id
     FROM vehicles v JOIN types ON v.type_id = types.id JOIN cities c ON v.city_id = c.id 
-    WHERE v.id = ?`;
+    WHERE v.id = ? AND deleted_at IS NULL`;
     db.query(sqlQuery, vehicleId, (err, result) => {
       if (err) return reject({ status: 500, err });
       if (result.length == 0) return resolve({ status: 404, result });
@@ -282,12 +283,30 @@ const getDetailVehicleById = (vehicleId) => {
   });
 };
 
-const deleteVehicleById = (vehicleId) => {
+// const deleteVehicleById = (vehicleId) => {
+//   return new Promise((resolve, reject) => {
+//     const sqlQuery = `DELETE FROM vehicles WHERE id = ${vehicleId}`;
+//     db.query(sqlQuery, (err) => {
+//       if (err) return reject({ status: 500, err });
+//       resolve({ status: 200 });
+//     });
+//   });
+// };
+
+const deleteVehicleById = (vehicleId, id) => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = `DELETE FROM vehicles WHERE id = ${vehicleId}`;
-    db.query(sqlQuery, (err) => {
-      if (err) return reject({ status: 500, err });
-      resolve({ status: 200 });
+    const timeStamp = getTimeStamp();
+    console.log(timeStamp);
+    const sqlDelete = `UPDATE vehicles SET deleted_at = ? WHERE user_id = ? AND id = ?`;
+    db.query(sqlDelete, [timeStamp, id, vehicleId], (err) => {
+      if (err) {
+        console.log(err);
+        return reject({ status: 500, err });
+      }
+      return resolve({
+        status: 200,
+        result: { msg: "Data deleted successfully" },
+      });
     });
   });
 };

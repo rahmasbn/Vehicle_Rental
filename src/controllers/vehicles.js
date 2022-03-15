@@ -151,9 +151,10 @@ const getDetailVehicleById = (req, res) => {
 const deleteVehicleById = (req, res) => {
   const { params } = req;
   const vehicleId = params.id;
+  const {id} = req.userInfo;
 
   vehicleModel
-    .deleteVehicleById(vehicleId)
+    .deleteVehicleById(vehicleId, id)
     .then(({ status }) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
