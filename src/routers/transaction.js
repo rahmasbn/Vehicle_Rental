@@ -23,6 +23,7 @@ transactionRouter.get("/", authorize.checkToken, transactionController.getTransa
 transactionRouter.get("/:id", authorize.checkToken, transactionController.getDetailTransactionById);
 
 // delete transaction
-transactionRouter.delete("/:id", authorize.checkToken, transactionController.deleteTransactionById);
+// transactionRouter.delete("/:id", authorize.checkToken, transactionController.deleteTransactionById);
+transactionRouter.delete("/", authorize.checkToken, transactionController.deleteTransactionById);
 
 module.exports = transactionRouter;
