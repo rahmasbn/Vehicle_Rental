@@ -185,6 +185,7 @@ const deleteTransaction = (req) => {
     prepare.push(mysql.raw(whereIn));
 
     db.query(sqlQuery, prepare, (err) => {
+      console.log(sqlQuery)
       if (err) return reject({ status: 500, err });
       resolve({ status: 200 });
     });
