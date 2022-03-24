@@ -106,11 +106,11 @@ const getDetailTransactionById = (req, res) => {
 };
 
 const deleteTransaction = (req, res) => {
-  const { body, userInfo } = req;
+  // const { params } = req;
   // const transactionId = params.id;
 
   transactionModel
-    .deleteTransaction(body.id, userInfo.roles)
+    .deleteTransaction(req)
     .then(({ status }) => {
       responseHelper.success(res, status, { msg: "Data deleted successfully" });
     })

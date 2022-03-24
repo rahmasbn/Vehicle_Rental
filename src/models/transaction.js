@@ -155,75 +155,40 @@ const getDetailTransactionById = (transactionId) => {
   });
 };
 
-// const deleteTransaction = (req) => {
-//   return new Promise((resolve, reject) => {
-//     const { body, userInfo } = req;
-//     const transactionId = body.id;
-//     const role = userInfo.roles;
-//     const userId = userInfo.id;
-//     const timeStamp = getTimeStamp();
-//     const prepare = [];
-//     const sqlQuery = `UPDATE transaction, vehicles SET ? = ? WHERE ? = ? AND transaction.id IN (?)`;
-//     let rolesId = "vehicles.user_id";
-
-//     if (role === 2) {
-//       prepare.push(mysql.raw("deleted_owner_at"));
-//     } else if (role === 3) {
-//       rolesId = "transaction.user_id";
-//       prepare.push(mysql.raw("deleted_customer_at"));
-//     } else {
-//       return reject({ status: 403, err: "Unauthorize access." });
-//     } 
-//     prepare.push(timeStamp);
-//     prepare.push(mysql.raw(rolesId));
-//     prepare.push(userId);
-//     console.log('roles id', rolesId)
-//     let whereIn = '';
-//     for (let i = 0; i < transactionId.length; i++) {
-//       whereIn += i !== transactionId.length - 1 ? transactionId[i]+',' : transactionId[i]
-//     }
-//     prepare.push(mysql.raw(whereIn));
-
-//     db.query(sqlQuery, prepare, (err, result) => {
-//       console.log(sqlQuery)
-//       if (err) return reject({ status: 500, err });
-//       resolve({ status: 200, result });
-//     });
-//   });
-// };
-
-const deleteTransaction = (id, roles) => {
+const deleteTransaction = (req) => {
   return new Promise((resolve, reject) => {
-    console.log('id, roles', id, roles);
+    const { body, userInfo } = req;
+    const transactionId = body.id;
+    const role = userInfo.roles;
+    const userId = userInfo.id;
     const timeStamp = getTimeStamp();
     const prepare = [];
-    // const sqlDeleteTransaction = `UPDATE transaction SET ? = ? 
-    // WHERE id IN (?)`;
-    if (roles === 3) {
-      prepare.push(mysql.raw('deleted_customer_at'));
+    const sqlQuery = `UPDATE transaction, vehicles SET ? = ? WHERE ? = ? AND transaction.id IN (?)`;
+    let rolesId = "vehicles.user_id";
+
+    if (role === 2) {
+      prepare.push(mysql.raw("deleted_owner_at"));
+    } else if (role === 3) {
+      rolesId = "transaction.user_id";
+      prepare.push(mysql.raw("deleted_customer_at"));
     } else {
-      prepare.push(mysql.raw('deleted_owner_at'));
-    }
+      return reject({ status: 403, err: "Unauthorize access." });
+    } 
     prepare.push(timeStamp);
-    // let whereIn = '';
-    // for (let i = 0; i < ids.length; i++) {
-    //   whereIn += i !== ids.length - 1 ? ids[i] + ',' : ids[i];
-    // }
-    // prepare.push(mysql.raw(whereIn));
-    // db.query(sqlDeleteTransaction, prepare, (err, result) => {
-    //   if (err) {
-    //     console.log(err);
-    //     return reject({
-    //       status: 500,
-    //       result: {err: 'Something went wrong.'},
-    //     });
-    //   }
-    //   console.log('result prepare', result, prepare);
-    //   return resolve({
-    //     status: 200,
-    //     result: {msg: 'Transactions deleted.', data: ids},
-    //   });
-    // });
+    prepare.push(mysql.raw(rolesId));
+    prepare.push(userId);
+    console.log('roles id', rolesId)
+    let whereIn = '';
+    for (let i = 0; i < transactionId.length; i++) {
+      whereIn += i !== transactionId.length - 1 ? transactionId[i]+',' : transactionId[i]
+    }
+    prepare.push(mysql.raw(whereIn));
+
+    db.query(sqlQuery, prepare, (err, result) => {
+      console.log(sqlQuery)
+      if (err) return reject({ status: 500, err });
+      resolve({ status: 200, result });
+    });
   });
 };
 
