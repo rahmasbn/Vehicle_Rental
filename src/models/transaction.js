@@ -164,12 +164,29 @@ const deleteTransaction = (req) => {
     const timeStamp = getTimeStamp();
     const prepare = [];
     const sqlQuery = `UPDATE transaction, vehicles SET ? = ? WHERE ? = ? AND transaction.id IN (?)`;
+    let rolesId = "vehicles.user_id";
     console.log(role);
-    // const sqlQuery = `DELETE FROM transaction WHERE id = ${transactionId}`;
-    // db.query(sqlQuery, (err) => {
-    //   if (err) return reject({ status: 500, err });
-    //   resolve({ status: 200 });
-    // });
+    if (role === 2) {
+      prepare.push(mysql.raw("deleted_owner_at"));
+    } else if (role === 3) {
+      rolesId = "transaction.user_id";
+      prepare.push(mysql.raw("deleted_customer_at"));
+    } else {
+      return reject({ status: 403, errMsg: "Unauthorize access." });
+    } 
+    prepare.push(timeStamp);
+    prepare.push(mysql.raw(rolesId));
+    prepare.push(userId);
+    let whereIn = '';
+    for (let i = 0; i < historyId.length; i++) {
+      whereIn += i !== historyId.length - 1 ? historyId[i]+',' : historyId[i]
+    }
+    prepare.push(mysql.raw(whereIn));
+
+    db.query(sqlQuery, prepare, (err) => {
+      if (err) return reject({ status: 500, err });
+      resolve({ status: 200 });
+    });
   });
 };
 
