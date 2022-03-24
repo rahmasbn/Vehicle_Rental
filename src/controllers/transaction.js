@@ -112,9 +112,10 @@ const deleteTransaction = (req, res) => {
   transactionModel
     .deleteTransaction(req)
     .then(({ status }) => {
-      responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
+      responseHelper.success(res, status, { msg: "Data deleted successfully" });
     })
     .catch(({ status, err }) => {
+      console.log(err)
       responseHelper.error(res, status, err);
     });
 };
