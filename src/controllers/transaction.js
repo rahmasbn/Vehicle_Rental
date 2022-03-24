@@ -105,12 +105,12 @@ const getDetailTransactionById = (req, res) => {
     });
 };
 
-const deleteTransactionById = (req, res) => {
-  const { params } = req;
-  const transactionId = params.id;
+const deleteTransaction = (req, res) => {
+  // const { params } = req;
+  // const transactionId = params.id;
 
   transactionModel
-    .deleteTransactionById(transactionId)
+    .deleteTransactionById(req)
     .then(({ status }) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
@@ -126,5 +126,5 @@ module.exports = {
   // getAllTransaction,
   getTransaction,
   getDetailTransactionById,
-  deleteTransactionById,
+  deleteTransaction,
 };

@@ -155,13 +155,21 @@ const getDetailTransactionById = (transactionId) => {
   });
 };
 
-const deleteTransactionById = (transactionId) => {
+const deleteTransaction = (req) => {
   return new Promise((resolve, reject) => {
-    const sqlQuery = `DELETE FROM transaction WHERE id = ${transactionId}`;
-    db.query(sqlQuery, (err) => {
-      if (err) return reject({ status: 500, err });
-      resolve({ status: 200 });
-    });
+    const { body, userInfo } = req;
+    const historyId = body.id;
+    const role = userInfo.roles;
+    const userId = userInfo.id;
+    const timeStamp = getTimeStamp();
+    const prepare = [];
+    const sqlQuery = `UPDATE transaction, vehicles SET ? = ? WHERE ? = ? AND transaction.id IN (?)`;
+    console.log(role);
+    // const sqlQuery = `DELETE FROM transaction WHERE id = ${transactionId}`;
+    // db.query(sqlQuery, (err) => {
+    //   if (err) return reject({ status: 500, err });
+    //   resolve({ status: 200 });
+    // });
   });
 };
 
@@ -172,5 +180,5 @@ module.exports = {
   // getAllTransaction,
   getTransaction,
   getDetailTransactionById,
-  deleteTransactionById,
+  deleteTransaction,
 };
