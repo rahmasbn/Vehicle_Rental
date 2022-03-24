@@ -172,7 +172,7 @@ const deleteTransaction = (req) => {
       rolesId = "transaction.user_id";
       prepare.push(mysql.raw("deleted_customer_at"));
     } else {
-      return reject({ status: 403, errMsg: "Unauthorize access." });
+      return reject({ status: 403, err: "Unauthorize access." });
     } 
     prepare.push(timeStamp);
     prepare.push(mysql.raw(rolesId));
@@ -184,10 +184,10 @@ const deleteTransaction = (req) => {
     }
     prepare.push(mysql.raw(whereIn));
 
-    db.query(sqlQuery, prepare, (err) => {
+    db.query(sqlQuery, prepare, (err, result) => {
       console.log(sqlQuery)
       if (err) return reject({ status: 500, err });
-      resolve({ status: 200 });
+      resolve({ status: 200, result });
     });
   });
 };
