@@ -9,16 +9,20 @@ const checkToken = (req, res, next) => {
   db.query(sqlQuery, [token], (err, result) => {
     if (err) return res.status(500).json(err);
     if (result.length !== 0)
-      return res
-        .status(403)
-        .json({ msg: "You need to login to perform this action." });
+      return res.status(403).json({
+        msg: "You need to login to perform this action.",
+        err_code: "INVALID_TOKEN",
+      });
   });
 
   jwt.verify(token, process.env.SECRET_KEY, jwtOptions, (err, payload) => {
     if (err)
       return res
         .status(403)
-        .json({ msg: "You need to login to perform this action." });
+        .json({
+          msg: "You need to login to perform this action.",
+          err_code: "TOKEN_EXPIRED",
+        });
     const { id, name, roles } = payload;
     req.userInfo = { id, name, roles };
     next();

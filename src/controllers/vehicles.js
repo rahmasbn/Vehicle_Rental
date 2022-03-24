@@ -72,7 +72,7 @@ const updateVehicleById = (req, res) => {
           msg: "Id vehicle tidak ditemukan",
         });
       responseHelper.success(res, status, {
-        msg: "Data added successfully",
+        msg: "Data updated successfully",
         result: {
           ...newBody,
           vehicleId,

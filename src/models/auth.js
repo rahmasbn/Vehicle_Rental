@@ -56,7 +56,7 @@ const login = (body) => {
             roles: result[0].roles_id,
           };
           const jwtOptions = {
-            expiresIn: "24h",
+            expiresIn: "1h",
             issuer: process.env.ISSUER,
           };
           jwt.sign(
@@ -95,31 +95,6 @@ const logout = (token) => {
   });
 };
 
-// const forgotPassword = (body) => {
-//   return new Promise((resolve, reject) => {
-//     const { email } = body;
-//     const sqlQuery = `SELECT * FROM users WHERE email = ?`;
-
-//     db.query(sqlQuery, [email], (err, result) => {
-//       if (err) return reject({ status: 500, err });
-//       if (result.length == 0)
-//         return reject({ status: 401, err: "Invalid Email" });
-
-//       const otp = Math.ceil(Math.random() * 1000000);
-//       console.log("OTP ", otp);
-
-//       const sqlQuery = `UPDATE users SET otp = ? WHERE email = ?`;
-//       db.query(sqlQuery, [otp, email], (err) => {
-//         if (err) return reject({ status: 500, err });
-//         const data = {
-//           email: email,
-//         };
-
-//         resolve({ status: 200, result: data });
-//       });
-//     });
-//   });
-// };
 
 const forgotPassword = (body) => {
   return new Promise((resolve, reject) => {
