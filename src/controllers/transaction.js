@@ -115,7 +115,7 @@ const deleteTransaction = (req, res) => {
       responseHelper.success(res, status, { msg: "Data deleted successfully" });
     })
     .catch(({ status, err }) => {
-      console.log(err)
+      console.log('error delete',err)
       responseHelper.error(res, status, err);
     });
 };

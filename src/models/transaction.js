@@ -158,14 +158,14 @@ const getDetailTransactionById = (transactionId) => {
 const deleteTransaction = (req) => {
   return new Promise((resolve, reject) => {
     const { body, userInfo } = req;
-    const historyId = body.id;
+    const transactionId = body.id;
     const role = userInfo.roles;
     const userId = userInfo.id;
     const timeStamp = getTimeStamp();
     const prepare = [];
     const sqlQuery = `UPDATE transaction, vehicles SET ? = ? WHERE ? = ? AND transaction.id IN (?)`;
     let rolesId = "vehicles.user_id";
-    console.log(role);
+
     if (role === 2) {
       prepare.push(mysql.raw("deleted_owner_at"));
     } else if (role === 3) {
@@ -177,9 +177,10 @@ const deleteTransaction = (req) => {
     prepare.push(timeStamp);
     prepare.push(mysql.raw(rolesId));
     prepare.push(userId);
+    console.log('roles id', rolesId)
     let whereIn = '';
-    for (let i = 0; i < historyId.length; i++) {
-      whereIn += i !== historyId.length - 1 ? historyId[i]+',' : historyId[i]
+    for (let i = 0; i < transactionId.length; i++) {
+      whereIn += i !== transactionId.length - 1 ? transactionId[i]+',' : transactionId[i]
     }
     prepare.push(mysql.raw(whereIn));
 
