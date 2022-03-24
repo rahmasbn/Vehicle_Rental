@@ -110,7 +110,7 @@ const deleteTransaction = (req, res) => {
   // const transactionId = params.id;
 
   transactionModel
-    .deleteTransactionById(req)
+    .deleteTransaction(req)
     .then(({ status }) => {
       responseHelper.success(res, status, { msg: "Data berhasil dihapus" });
     })
