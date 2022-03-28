@@ -212,6 +212,7 @@ const getAllVehiclesWithOrder = (query, keyword, order) => {
           page == Math.ceil(totalData / limit)
             ? null
             : `/vehicles?page=${page + 1}&limit=${limit}` + data,
+        page,
         prev:
           page == 1 ? null : `/vehicles?page=${page - 1}&limit=${limit}` + data,
       };
