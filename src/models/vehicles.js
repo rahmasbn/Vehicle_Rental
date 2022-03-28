@@ -76,7 +76,7 @@ const getVehicleByRating = (order, query) => {
       // }
       if (!query.page && !query.limit) {
         page = 1;
-        limit = 100;
+        limit = 8;
         offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
         prepStatement.push(limit, offset);
@@ -94,6 +94,7 @@ const getVehicleByRating = (order, query) => {
           page == Math.ceil(totalData / limit)
             ? null
             : `/vehicles/popular` + data,
+        page,
         prev: page == 1 ? null : `/vehicles/popular` + data,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
