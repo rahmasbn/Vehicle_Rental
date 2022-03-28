@@ -80,12 +80,12 @@ const getVehicleByRating = (order, query) => {
         offset = 0;
         sqlQuery += " LIMIT ? OFFSET ?";
         prepStatement.push(limit, offset);
-        data += `?page=${page + 1}&limit=${limit}`;
+        // data += `?page=${page + 1}&limit=${limit}`;
       } else {
         sqlQuery += " LIMIT ? OFFSET ?";
         offset = (page - 1) * limit;
         prepStatement.push(limit, offset);
-        data += `?page=${page - 1}&limit=${limit}`;
+        // data += `?page=${page - 1}&limit=${limit}`;
       }
 
       const meta = {
@@ -93,9 +93,12 @@ const getVehicleByRating = (order, query) => {
         next:
           page == Math.ceil(totalData / limit)
             ? null
-            : `/vehicles/popular` + data,
+            : `/vehicles/popular${data}&page=${page + 1}&limit=${limit}`,
         page,
-        prev: page == 1 ? null : `/vehicles/popular` + data,
+        prev:
+          page == 1
+            ? null
+            : `/vehicles/popular${data}&page=${page - 1}&limit=${limit}`,
       };
       db.query(sqlQuery, prepStatement, (err, result) => {
         if (err) return reject({ status: 500, err });
